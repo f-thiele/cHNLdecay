@@ -59,13 +59,12 @@ int main() {
 
   std::vector<Meson> mesons = {pi, K, D, Ds, B, Bc, pi0, eta, etaprime, etac, rho, Dstar, Dstars, rho0, omega, phi, jpsi};
 
-  HNL N = HNL("20G", 20000, 1e-5, mu); // 20 GeV but notated in MeV
+  HNL N = HNL("20G", 20000, 3.55e-6, mu); // 20 GeV but notated in MeV
   TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1, 100, 0);
   Double_t qcorr = qcd_correction(f->Eval(N.getMass()/1000.));
   std::cout << "QCD correction: " << qcorr << std::endl;
 
 
-  Double_t totalWidth = 0;
   Double_t tw_lept = 0;
   Double_t tw_mes = 0;
 
@@ -78,7 +77,9 @@ int main() {
     }
   }
 
-  totalWidth = qcorr*(tw_mes) + tw_lept;
+  Double_t totalWidth = (1+qcorr)*tw_mes + tw_lept;
+  totalWidth *= 2.; // multiply by two for majorana channels
+
   std::cout << "mass=" << N.getMass()/1000. << " GeV, "
             << "ctau=" << gamma2ctau(cfg, totalWidth) << " mm" << std::endl;
 
