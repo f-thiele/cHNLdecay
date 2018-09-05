@@ -9,6 +9,8 @@
 #include <map>
 #include <vector>
 #include "TAxis.h"
+#include "TF1.h"
+#include "auxfunctions.h"
 
 void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize=10) {
   std::vector<Double_t> res_m;
@@ -149,5 +151,14 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vect
   g_lep->Draw("SAME");
   g_inv->Draw("SAME");
   leg->Draw();
+  c1->SaveAs(output);
+}
+
+void plot_qcd_correction(TString output) {
+  TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1000, 5000, 0);
+  f->SetMaximum(0.35);
+  f->SetMinimum(0);
+  TCanvas* c1 = new TCanvas("c1", "c1", 500, 400);
+  f->Draw();
   c1->SaveAs(output);
 }
