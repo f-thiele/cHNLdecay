@@ -89,6 +89,8 @@ int main() {
     vector_charged.emplace_back(m);
   }
   plot_meson_pw(cfg, mu, vector_charged, N, "mesons_vector_charged.pdf", 500, 5000);
+  plot_I();
+  plot_br(cfg, all_leptons, mesons, N, "BR.pdf", 1000, 5000);
 
 
   return EXIT_SUCCESS;

@@ -44,7 +44,8 @@ class HNL {
     return Lepton(generation);
   }
 
-  Double_t getPartialWidth(std::shared_ptr<Config> cfg, Lepton &alpha, Lepton &beta) const;
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, Lepton &alpha, Lepton &beta, bool invisible=true) const;
+  Double_t getPartialWidthInv(std::shared_ptr<Config> cfg, Lepton &alpha, Lepton &beta) const;
   Double_t getPartialWidth(std::shared_ptr<Config> cfg, Lepton &alpha, Meson &m) const;
 
  private:

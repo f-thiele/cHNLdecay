@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include "TAxis.h"
 
 void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize=10) {
   std::vector<Double_t> res_m;
@@ -89,5 +90,64 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
   }
   leg->Draw();
   c1->SetLogy();
+  c1->SaveAs(output);
+}
+
+void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize=10) {
+  std::vector<Double_t> res_m;
+  std::vector<Double_t> res_mes;
+  std::vector<Double_t> res_lep;
+  std::vector<Double_t> res_inv;
+
+  for(Int_t mass = lowMass; mass < highMass; mass+=stepsize) {
+    N.setMass(mass);
+
+    Double_t tw_mes = 0;
+    Double_t tw_lep = 0;
+    Double_t tw_inv = 0;
+    for(auto l1 : leptons) {
+      for(auto l2 : leptons) {
+        tw_lep += N.getPartialWidth(cfg, l1, l2, false);
+        tw_inv += N.getPartialWidthInv(cfg, l1, l2);
+      }
+      for(auto m : mesons) {
+        tw_mes += N.getPartialWidth(cfg, l1, m);
+      }
+    }
+    res_m.emplace_back(mass);
+    Double_t tot = tw_mes + tw_lep + tw_inv;
+    res_mes.emplace_back(tw_mes/tot);
+    res_lep.emplace_back(tw_lep/tot);
+    res_inv.emplace_back(tw_inv/tot);
+  }
+
+  TCanvas* c1 = new TCanvas("c1", "c1", 500, 400);
+
+  TGraph* g_mes = new TGraph(res_m.size(), &(res_m[0]), &(res_mes[0]));
+  TGraph* g_lep = new TGraph(res_m.size(), &(res_m[0]), &(res_lep[0]));
+  TGraph* g_inv = new TGraph(res_m.size(), &(res_m[0]), &(res_inv[0]));
+
+  g_mes->SetLineColor(kBlue);
+  g_mes->SetLineWidth(2);
+  g_lep->SetLineColor(kRed);
+  g_lep->SetLineWidth(2);
+  g_lep->SetLineStyle(9);
+  g_inv->SetLineColor(kGreen);
+  g_inv->SetLineWidth(2);
+  g_inv->SetLineStyle(7);
+
+  TLegend* leg = new TLegend(0.15, 0.15, 0.6, 0.3);
+  leg->AddEntry(g_mes, "quarks");
+  leg->AddEntry(g_lep, "leptons");
+  leg->AddEntry(g_inv, "invisible");
+  //c1->SetLogy();
+  c1->SetLogx();
+
+  g_mes->Draw("AL");
+  g_mes->GetYaxis()->SetRangeUser(0.01, 1);
+  g_mes->GetXaxis()->SetRangeUser(1000, 5000);
+  g_lep->Draw("SAME");
+  g_inv->Draw("SAME");
+  leg->Draw();
   c1->SaveAs(output);
 }

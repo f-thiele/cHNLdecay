@@ -171,7 +171,7 @@ void plot_I() {
   h->Draw("SAME");
   i->Draw("SAME");
   leg->Draw();
-  c1->SaveAs("output.pdf");
+  c1->SaveAs("I_xu_xd_xl.pdf");
   delete c1;
   delete g;
   delete h;

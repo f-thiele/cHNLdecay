@@ -1,14 +1,21 @@
 #include "HNL.h"
 #include "partialWidths.h"
 
-Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, Lepton &alpha, Lepton &beta) const {
+Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, Lepton &alpha, Lepton &beta, bool invisible) const {
   Double_t dw = 0;
   dw += std::max(0., pw_nualpha_lbeta_lbeta(cfg, alpha, beta, *this));
   dw += std::max(0., pw_lalpha_lbeta_nubeta(cfg, alpha, beta, *this));
-  dw += std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
+  if(invisible)
+    dw += std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
 
   return dw;
 }
+
+
+Double_t HNL::getPartialWidthInv(std::shared_ptr<Config> cfg, Lepton &alpha, Lepton &beta) const {
+  return std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
+}
+
 
 Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, Lepton &alpha, Meson &m) const {
   Double_t dw = 0;
