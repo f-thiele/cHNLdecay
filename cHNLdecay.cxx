@@ -17,8 +17,13 @@
 #include "auxfunctions.h"
 #include "partialWidths.h"
 #include "plots.h"
+#include "Logger.h"
+
+Level gLOGLEVEL;
 
 int main() {
+  gLOGLEVEL = Level::INFO;
+
   auto cfg = std::make_shared<Config>(); // set BITS and initialize constants
 
   Double_t muonMass = 105.6583715; // MeV
@@ -59,10 +64,10 @@ int main() {
 
   std::vector<Meson> mesons = {pi, K, D, Ds, B, Bc, pi0, eta, etaprime, etac, rho, Dstar, Dstars, rho0, omega, phi, jpsi};
 
-  HNL N = HNL("20G", 20000, 3.55e-6, mu); // 20 GeV but notated in MeV
+  HNL N = HNL("20G", 5000, 3.66e-4, mu); // 20 GeV but notated in MeV
   TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1, 100, 0);
   Double_t qcorr = qcd_correction(f->Eval(N.getMass()/1000.));
-  std::cout << "QCD correction: " << qcorr << std::endl;
+  LOG_INFO("QCD correction: " << qcorr);
 
 
   Double_t tw_lept = 0;
@@ -70,18 +75,22 @@ int main() {
 
   for(auto l1 : all_leptons) {
     for(auto l2 : all_leptons) {
-      tw_lept += N.getPartialWidth(cfg, l1, l2);
+      Double_t t = N.getPartialWidth(cfg, l1, l2);
+      if(t>0) LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << t);
+      tw_lept += t;
     }
     for(auto m : mesons) {
-      tw_mes += N.getPartialWidth(cfg, l1, m);
+      Double_t t = N.getPartialWidth(cfg, l1, m);
+      if(t>0) LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
+      tw_mes += t;
     }
   }
 
   Double_t totalWidth = (1+qcorr)*tw_mes + tw_lept;
-  totalWidth *= 2.; // multiply by two for majorana channels
+  totalWidth *= 1.; // multiply by two for majorana channels
 
-  std::cout << "mass=" << N.getMass()/1000. << " GeV, "
-            << "ctau=" << gamma2ctau(cfg, totalWidth) << " mm" << std::endl;
+  LOG_INFO("mass=" << N.getMass()/1000. << " GeV, " <<
+           "ctau=" << gamma2ctau(cfg, totalWidth) << " mm");
 
   std::vector<Meson> vector_charged;
   for(auto m : mesons) {
@@ -89,6 +98,10 @@ int main() {
     if(m.getCharge() != Charge::charged) continue;
     vector_charged.emplace_back(m);
   }
+
+  N.setMass(3000);
+  LOG_WARNING("pw: " << N.getPartialWidth(cfg, mu, rho));
+
   plot_meson_pw(cfg, mu, vector_charged, N, "mesons_vector_charged.pdf", 500, 5000);
   plot_I();
   plot_br(cfg, all_leptons, mesons, N, "BR.pdf", 1000, 5000);

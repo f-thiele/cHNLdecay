@@ -7,9 +7,12 @@
 #include <vector>
 #include "auxfunctions.h"
 #include "partialWidths.h"
+#include "Logger.h"
 
-Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg, Lepton alpha, Lepton beta, HNL N) {
+Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
+  if(N.getMass() < 2.*beta.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+
   mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
@@ -172,10 +175,12 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg, Lepton alpha, Lepto
 }
 
 
-Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg, Lepton alpha, Lepton beta, HNL N) {
+Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, const HNL &N) {
 
   if(not N.mixesWith(alpha)) return 0;
   if(alpha == beta) return 0;
+  if(N.getMass() < std::max(alpha.getMass(), beta.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
@@ -224,8 +229,13 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg, Lepton alpha, Lepto
   return mpfr_get_d(result, MPFR_RNDD);
 }
 
-Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg, Lepton alpha, Lepton beta, HNL N) {
+Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
+
+  /*
+   * We just need to load configuration for precision bits and
+   * nature constants
+   */
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
@@ -240,19 +250,20 @@ Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg, Lepton alpha, Lep
   cfg->getVUDsq(VUDsq);
   cfg->getSOL(SOL);
   cfg->getHBAR(HBAR);
+  // end of loading configuration
 
-  mpfr_t equal, HNLmass, angle;
-  mpfr_init2(equal, BITS);
+  // initialize and set vars to M_N, U^2
+  mpfr_t HNLmass, angle;
   mpfr_init2(HNLmass, BITS);
   mpfr_init2(angle, BITS);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
 
+  unsigned int equal = 0;
   if(alpha==beta) {
-     mpfr_set_d(equal, 1, MPFR_RNDD);
-  } else {
-     mpfr_set_d(equal, 0, MPFR_RNDD);
+    equal += 1;
   }
+  equal += 1; // increase by one to get the right factor (1+delta_{alpha,beta})
 
   mpfr_t result, temp;
   mpfr_init2(result, BITS);
@@ -260,19 +271,20 @@ Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg, Lepton alpha, Lep
 
   mpfr_pow_ui(result, HNLmass, 5, MPFR_RNDD);
   mpfr_mul(result, fermiCsq, result, MPFR_RNDD);
-  mpfr_add_ui(equal, equal, 1, MPFR_RNDD);
-  mpfr_mul(result, result, equal, MPFR_RNDD);
+  mpfr_mul_ui(result, result, equal, MPFR_RNDD);
+  mpfr_mul(result, result, angle, MPFR_RNDD);
   mpfr_pow_ui(temp, pi, 3, MPFR_RNDD);
   mpfr_mul_ui(temp, temp, 768, MPFR_RNDD);
   mpfr_div(result, result, temp, MPFR_RNDD);
-  mpfr_mul(result, result, angle, MPFR_RNDD);
 
 
   return mpfr_get_d(result, MPFR_RNDD);
 }
 
-Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Meson m, HNL N) {
+Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
+  if(N.getMass() < m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
@@ -325,8 +337,10 @@ Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, Lepton alph
   return mpfr_get_d(result, MPFR_RNDD);
 }
 
-Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Meson m, HNL N) {
+Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
+  if(N.getMass() < std::max(alpha.getMass(), m.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
@@ -404,8 +418,10 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, Lepton alph
   return mpfr_get_d(result, MPFR_RNDD);
 }
 
-Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Meson m, HNL N) {
+Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
+  if(N.getMass() < std::max(alpha.getMass(), m.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
@@ -422,10 +438,10 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Mes
   cfg->getHBAR(HBAR);
 
   // initialize high precision variables
-  mpfr_t xh, xl, gh;
+  mpfr_t xhsq, xlsq, gh;
   mpfr_t mesonMass, alphaMass, HNLmass, angle;
-  mpfr_init2(xh, BITS);
-  mpfr_init2(xl, BITS);
+  mpfr_init2(xhsq, BITS);
+  mpfr_init2(xlsq, BITS);
   mpfr_init2(gh, BITS);
   mpfr_init2(mesonMass, BITS);
   mpfr_init2(alphaMass, BITS);
@@ -438,14 +454,15 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Mes
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
   mpfr_set_d(gh, m.getDecayConstant(), MPFR_RNDD);
-  mpfr_div(xl, alphaMass, HNLmass, MPFR_RNDD);
-  mpfr_div(xh, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_div(xlsq, alphaMass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xlsq, xlsq, 2, MPFR_RNDD);
+  mpfr_div(xhsq, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xhsq, xhsq, 2, MPFR_RNDD);
 
   // create result and temp variables
-  mpfr_t result, temp, temp2, temp3;
+  mpfr_t result, temp, temp2;
   mpfr_init2(temp, BITS);
   mpfr_init2(temp2, BITS);
-  mpfr_init2(temp3, BITS);
   mpfr_init2(result, BITS);
 
   mpfr_pow_ui(temp, gh, 2, MPFR_RNDD);
@@ -459,39 +476,37 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Mes
   mpfr_mul(temp, temp, temp2, MPFR_RNDD);
   mpfr_div(result, result, temp, MPFR_RNDD);
 
-  mpfr_pow_ui(temp, xl, 2, MPFR_RNDD);
-  mpfr_ui_sub(temp, 1, temp, MPFR_RNDD);
+  mpfr_ui_sub(temp, 1, xlsq, MPFR_RNDD);
   mpfr_pow_ui(temp, temp, 2, MPFR_RNDD);
 
-  mpfr_pow_ui(temp2, xl, 2, MPFR_RNDD);
-  mpfr_add_ui(temp, temp, 1, MPFR_RNDD);
-  mpfr_pow_ui(temp3, xh, 2, MPFR_RNDD);
-  mpfr_mul(temp2, temp2, temp3, MPFR_RNDD);
+  mpfr_add_ui(temp2, xlsq, 1, MPFR_RNDD);
+  mpfr_mul(temp2, temp2, xhsq, MPFR_RNDD);
   mpfr_add(temp, temp, temp2, MPFR_RNDD);
-  mpfr_pow_ui(temp2, xh, 4, MPFR_RNDD);
+  mpfr_pow_ui(temp2, xhsq, 2, MPFR_RNDD);
   mpfr_mul_ui(temp2, temp2, 2, MPFR_RNDD);
-  mpfr_sub(temp, temp, temp2, MPFR_RNDD);
-  mpfr_mul(result, result, temp, MPFR_RNDD);
+  mpfr_sub(temp2, temp, temp2, MPFR_RNDD);
 
   mpfr_t one;
   mpfr_init2(one, BITS);
   mpfr_set_d(one, 1, MPFR_RNDD);
 
-  mpfr_pow_ui(temp2, xh, 2, MPFR_RNDD);
-  mpfr_pow_ui(temp3, xl, 2, MPFR_RNDD);
-
-  kaellen(cfg, temp, one, temp2, temp3);
+  kaellen(cfg, temp, one, xhsq, xlsq);
   mpfr_sqrt(temp, temp, MPFR_RNDD);
+  mpfr_mul(temp, temp, temp2, MPFR_RNDD);
+  LOG_DEBUG("value of after factor: " << mpfr_get_d(temp, MPFR_RNDD));
+  LOG_DEBUG("value of Gamma0: " << mpfr_get_d(result, MPFR_RNDD));
 
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
   return mpfr_get_d(result, MPFR_RNDD);
 }
 
-Double_t pw_neutral_vector_mesons(std::shared_ptr<Config> cfg, Lepton alpha, Meson m, HNL N) {
+Double_t pw_neutral_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
   if(not m.hasValue("kh"))
     throw std::runtime_error("Neutral mesons need to have dimensionless kh factor stored as 'kh' value.");
+  if(N.getMass() < m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+
   mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);

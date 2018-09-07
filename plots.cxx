@@ -11,6 +11,7 @@
 #include "TAxis.h"
 #include "TF1.h"
 #include "auxfunctions.h"
+#include "Logger.h"
 
 void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize=10) {
   std::vector<Double_t> res_m;
@@ -21,9 +22,10 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
     meson_pws.insert(std::pair<TString, std::vector<Double_t>>(m.getName(), {}));
   }
 
-  for(Int_t mass = lowMass; mass < highMass; mass+=stepsize) {
+  for(Int_t mass = lowMass; mass <= highMass; mass+=stepsize) {
     N.setMass(mass);
     for(auto m : mesons) {
+      LOG_DEBUG("Meson: " << m.getName());
       Double_t pw =N.getPartialWidth(cfg, alpha, m);
       mpfr_t fermiC, fermiCsq, pi, VUDsq;
       unsigned int BITS = cfg->getBITS();
@@ -57,13 +59,17 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
       mpfr_pow_ui(temp, gh, 2, MPFR_RNDD);
       mpfr_mul(factor, factor, temp, MPFR_RNDD);
       mpfr_mul(factor, factor, fermiCsq, MPFR_RNDD);
-      mpfr_mul_ui(temp, mesonMass, 2, MPFR_RNDD);
+      mpfr_pow_ui(temp, mesonMass, 2, MPFR_RNDD);
       mpfr_mul(temp, temp, pi, MPFR_RNDD);
       mpfr_mul_ui(temp, temp, 16, MPFR_RNDD);
       mpfr_div(factor,factor,temp, MPFR_RNDD);
+
+
       // end calculation first factors
       Double_t Gamma0 =mpfr_get_d(factor, MPFR_RNDD);
-      // std::cout << "mass: " << mass << " -- " << pw/Gamma0 << std::endl;
+      LOG_DEBUG("Gamma0:" << Gamma0);
+      LOG_DEBUG("pw:" << pw);
+      LOG_DEBUG("mass: " << mass << " -- " << pw/Gamma0);
       meson_pws.at(m.getName()).emplace_back(pw/Gamma0);
     }
 
@@ -84,6 +90,7 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
   bool first = true;
   for(auto g : graphs) {
     if(first) {
+      g->GetYaxis()->SetRangeUser(0.01, 1.1);
       g->Draw("AL");
       first = false;
     } else {
@@ -93,6 +100,11 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
   leg->Draw();
   c1->SetLogy();
   c1->SaveAs(output);
+  delete c1;
+  delete leg;
+  for(auto g: graphs) {
+    delete g;
+  }
 }
 
 void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize=10) {
@@ -116,6 +128,7 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vect
         tw_mes += N.getPartialWidth(cfg, l1, m);
       }
     }
+    LOG_DEBUG("mass: " << N.getMass() << ", meson pw: " << tw_mes);
     res_m.emplace_back(mass);
     Double_t tot = tw_mes + tw_lep + tw_inv;
     res_mes.emplace_back(tw_mes/tot);
@@ -146,12 +159,17 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vect
   c1->SetLogx();
 
   g_mes->Draw("AL");
-  g_mes->GetYaxis()->SetRangeUser(0.01, 1);
+  g_mes->GetYaxis()->SetRangeUser(0.05, 1);
   g_mes->GetXaxis()->SetRangeUser(1000, 5000);
   g_lep->Draw("SAME");
   g_inv->Draw("SAME");
   leg->Draw();
   c1->SaveAs(output);
+  delete leg;
+  delete c1;
+  delete g_mes;
+  delete g_lep;
+  delete g_inv;
 }
 
 void plot_qcd_correction(TString output) {
@@ -161,4 +179,6 @@ void plot_qcd_correction(TString output) {
   TCanvas* c1 = new TCanvas("c1", "c1", 500, 400);
   f->Draw();
   c1->SaveAs(output);
+  delete c1;
+  delete f;
 }
