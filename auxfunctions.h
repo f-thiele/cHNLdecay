@@ -1,3 +1,5 @@
+// Copyright (C) 2018 - Fabian A.J. Thiele, <fabian.thiele@cern.ch>
+
 #ifndef   AUXFUNCTIONS_H
 #define   AUXFUNCTIONS_H
 #include "TGraph.h"

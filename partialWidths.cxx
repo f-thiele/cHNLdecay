@@ -1,3 +1,5 @@
+// Copyright (C) 2018 - Fabian A.J. Thiele, <fabian.thiele@cern.ch>
+
 #include "Lepton.h"
 #include "Meson.h"
 #include "HNL.h"

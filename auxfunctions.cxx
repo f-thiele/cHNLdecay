@@ -1,3 +1,5 @@
+// Copyright (C) 2018 - Fabian A.J. Thiele, <fabian.thiele@cern.ch>
+
 #include "TF1.h"
 #include "Math/WrappedTF1.h"
 #include "Math/GaussIntegrator.h"

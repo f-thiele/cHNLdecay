@@ -1,3 +1,5 @@
+// Copyright (C) 2018 - Fabian A.J. Thiele, <fabian.thiele@cern.ch>
+
 #ifndef   MESON_H
 #define   MESON_H
 #include <map>
