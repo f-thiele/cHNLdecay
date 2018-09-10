@@ -111,8 +111,8 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg, const Lepton &alpha
     mpfr_pow_ui(c1, weinberg, 2, MPFR_RNDD);
     mpfr_mul_ui(c1, c1, 8, MPFR_RNDD);
     mpfr_mul_ui(temp, weinberg, 4, MPFR_RNDD);
+    mpfr_ui_sub(temp, 1, temp, MPFR_RNDD);
     mpfr_add(c1, c1, temp, MPFR_RNDD);
-    mpfr_ui_sub(c1, 1, c1, MPFR_RNDD);
     mpfr_div_ui(c1, c1, 4, MPFR_RNDD);
 
     mpfr_mul_ui(c2, weinberg, 2, MPFR_RNDD);
