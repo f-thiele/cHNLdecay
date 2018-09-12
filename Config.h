@@ -20,6 +20,10 @@ class Config {
     initialize();
   }
 
+  ~Config(void) {
+    mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, (mpfr_ptr) 0);
+  }
+
   TString getName() const {
     return name;
   }
