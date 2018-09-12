@@ -172,8 +172,10 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg, const Lepton &alpha
   mpfr_add(result, temp, temp2, MPFR_RNDD);
   mpfr_mul(result, factor, result, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
 
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, result, denominator, temp, x, factor, betamass, HNLmass, NZ, angle, sq1m4x2, L, weinberg, c1, c2, c1_factor, c2_factor, temp2, (mpfr_ptr) 0);
+  return rval;
 }
 
 
@@ -183,7 +185,7 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alpha
   if(alpha == beta) return 0;
   if(N.getMass() < std::max(alpha.getMass(), beta.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
-   mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
+  mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
@@ -228,7 +230,10 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alpha
   mpfr_mul(result, result, angle, MPFR_RNDD);
   mpfr_mul(result, result, I, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, I, NW, angle, HNLmass, result, temp, (mpfr_ptr) 0);
+
+  return rval;
 }
 
 Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, const HNL &N) {
@@ -279,15 +284,17 @@ Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alp
   mpfr_mul_ui(temp, temp, 768, MPFR_RNDD);
   mpfr_div(result, result, temp, MPFR_RNDD);
 
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, HNLmass, angle, result, temp, (mpfr_ptr) 0);
+  return rval;
 }
 
 Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
   if(N.getMass() < m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
-   mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
+  mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
@@ -336,7 +343,10 @@ Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   mpfr_pow_ui(temp, temp, 2, MPFR_RNDD);
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, xh, fh, mesonMass, HNLmass, angle, result, temp, (mpfr_ptr) 0);
+
+  return rval;
 }
 
 Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
@@ -417,7 +427,10 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
 
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, xh, xl, fh, mesonMass, alphaMass, HNLmass, angle, result, temp, temp2, temp3, one, (mpfr_ptr) 0);
+
+  return rval;
 }
 
 Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
@@ -500,7 +513,10 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
 
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, one, result, temp, temp2, xhsq, xlsq, gh, mesonMass, alphaMass, HNLmass, angle, (mpfr_ptr) 0);
+
+  return rval;
 }
 
 Double_t pw_neutral_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
@@ -571,5 +587,8 @@ Double_t pw_neutral_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
   mpfr_mul(result, result, temp, MPFR_RNDD);
   mpfr_mul(result, result, temp2, MPFR_RNDD);
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, result, temp, temp2, xh, gh, kh,mesonMass, HNLmass, angle, (mpfr_ptr) 0);
+
+  return rval;
 }

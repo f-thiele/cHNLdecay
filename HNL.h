@@ -1,6 +1,8 @@
 #ifndef   HNL_H
 #define   HNL_H
 
+#include <map>
+#include <utility>
 #include <iostream>
 #include "TString.h"
 #include "Config.h"
@@ -14,13 +16,16 @@ class HNL {
     mass = m;
     angle = U2;
     generation.emplace_back(Lepton(a.getName(), a.getMass()));
+    dc_c;
   }
   HNL(TString n, Double_t m, Double_t U2, const std::vector<Lepton> &a) {
     name = n;
     mass = m;
     angle = U2;
-    for(auto l : a)
+    for(auto l : a) {
       generation.emplace_back(Lepton(l.getName(), l.getMass()));
+    }
+    dc_c;
   }
 
   bool mixesWith(const Lepton& a) const {
@@ -40,10 +45,12 @@ class HNL {
   }
 
   void setMass(Double_t m) {
+    clearDecayChannels();
     mass = m;
   }
 
   void setAngle(Double_t a) {
+    clearDecayChannels();
     angle = a;
   }
 
@@ -51,18 +58,36 @@ class HNL {
     return name;
   }
 
+  void newDecayChannel(TString name, Double_t value) {
+    dc_c.insert(std::pair<TString, Double_t>(name, value));
+  }
+
+  bool existDecayChannel(TString name) const {
+    return (dc_c.count(name) > 0);
+  }
+
+  void clearDecayChannels() {
+    dc_c.clear();
+  }
+
+  std::map<TString, Double_t> getDecayChannels() const {
+    return dc_c;
+  }
+
   std::vector<Lepton> getGeneration() const {
     return generation;
   }
 
-  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, bool invisible=true) const;
-  Double_t getPartialWidthInv(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta) const;
-  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m) const;
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, bool invisible=true);
+  Double_t getPartialWidthInv(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta);
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m);
+  Double_t getTotalWidth(std::shared_ptr<Config> cfg, const std::vector<Lepton> &leptons, const std::vector<Meson> &mesons);
 
  private:
   TString name;
   Double_t mass;
   Double_t angle;
   std::vector<Lepton> generation;
+  std::map<TString, Double_t> dc_c; // decay channels stored
 };
 #endif

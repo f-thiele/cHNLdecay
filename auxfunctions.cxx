@@ -10,6 +10,11 @@
 #include "TLegend.h"
 #include "auxfunctions.h"
 #include "Config.h"
+#include "Lepton.h"
+#include "Meson.h"
+#include "HNL.h"
+#include "Config.h"
+#include "Logger.h"
 
 void kaellen(std::shared_ptr<Config> cfg, mpfr_t result, mpfr_t a, mpfr_t b, mpfr_t c) {
    unsigned int BITS = cfg->getBITS();
@@ -30,6 +35,7 @@ void kaellen(std::shared_ptr<Config> cfg, mpfr_t result, mpfr_t a, mpfr_t b, mpf
    mpfr_mul(temp, b, c, MPFR_RNDD);
    mpfr_mul_ui(temp, temp, 2, MPFR_RNDD);
    mpfr_sub(result, result, temp, MPFR_RNDD);
+   mpfr_clear(temp);
 }
 
 Double_t kaellen(Double_t a, Double_t b, Double_t c) {
@@ -96,7 +102,10 @@ Double_t gamma2ctau(std::shared_ptr<Config> cfg, Double_t gamma) {
   mpfr_mul_ui(_gamma, _gamma, 1e6, MPFR_RNDD); // now in [eV]
   mpfr_div(result, result, _gamma, MPFR_RNDD); // [mm]
 
-  return mpfr_get_d(result, MPFR_RNDD);
+  Double_t rval = mpfr_get_d(result, MPFR_RNDD);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, _gamma, result, (mpfr_ptr) 0);
+
+  return rval;
 }
 
 Double_t qcd_coupling(Double_t* x, Double_t* par) {
@@ -114,6 +123,8 @@ void plot_qcd_coupling() {
   c1->SetLogx();
   f->Draw();
   c1->SaveAs("qcd_coupling.pdf");
+  delete f;
+  delete c1;
 }
 
 Double_t qcd_correction(Double_t alpha) {
@@ -143,6 +154,29 @@ TGraph* create_graph(Double_t xd, Double_t xl, Float_t low, Float_t high, Float_
   TGraph* g = new TGraph(res_x.size(), &(res_x[0]), &(res_y[0]));
 
   return g;
+}
+
+Double_t ctauToU2(std::shared_ptr<Config> cfg, Double_t target, const std::vector<Lepton> &leptons, const std::vector<Meson> &mesons, HNL &N, Double_t start, Double_t tol, Double_t stepsize) {
+  N.setAngle(start);
+  Double_t ctau = gamma2ctau(cfg, N.getTotalWidth(cfg, leptons, mesons));
+  Double_t found_angle = start;
+  UInt_t iterations = 0;
+  Double_t prev_ctau = ctau;
+
+  for(Double_t angle = start; abs(target-ctau)>tol; angle*=stepsize) {
+    iterations++;
+    N.setAngle(angle);
+    ctau = gamma2ctau(cfg, N.getTotalWidth(cfg, leptons, mesons));
+    if(abs(target-ctau) > abs(target-prev_ctau)) {
+      LOG_WARNING("Stopped at angle=" << angle << " with ctau=" << ctau << " as distance increased to previous ctau=" << prev_ctau);
+      break;
+    }
+    found_angle = angle;
+    if(iterations % 1000) {
+      std::cout << "\rangle=" << angle << ", ctau=" << ctau << std::flush;
+    }
+  }
+  return found_angle;
 }
 
 void plot_I() {
