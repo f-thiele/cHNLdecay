@@ -183,7 +183,7 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg, const Lepton &alpha
 
   if(not N.mixesWith(alpha)) return 0;
   if(alpha == beta) return 0;
-  if(N.getMass() < std::max(alpha.getMass(), beta.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+  if(N.getMass() < alpha.getMass() + beta.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
   mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
@@ -351,7 +351,7 @@ Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
 
 Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
-  if(N.getMass() < std::max(alpha.getMass(), m.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+  if(N.getMass() < alpha.getMass() + m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
@@ -435,7 +435,7 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
 
 Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m, const HNL &N) {
   if(not N.mixesWith(alpha)) return 0;
-  if(N.getMass() < std::max(alpha.getMass(), m.getMass())) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
+  if(N.getMass() < alpha.getMass() + m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
    mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
