@@ -310,10 +310,10 @@ Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   cfg->getHBAR(HBAR);
 
   // initialize high precision variables
-  mpfr_t xh, fh;
+  mpfr_t xhsq, fhsq;
   mpfr_t mesonMass, HNLmass, angle;
-  mpfr_init2(xh, BITS);
-  mpfr_init2(fh, BITS);
+  mpfr_init2(xhsq, BITS);
+  mpfr_init2(fhsq, BITS);
   mpfr_init2(mesonMass, BITS);
   mpfr_init2(HNLmass, BITS);
   mpfr_init2(angle, BITS);
@@ -322,29 +322,29 @@ Double_t pw_neutral_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   mpfr_set_d(mesonMass, m.getMass(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
-  mpfr_set_d(fh, m.getDecayConstant(), MPFR_RNDD);
-  mpfr_div(xh, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_set_d(fhsq, m.getDecayConstant(), MPFR_RNDD);
+  mpfr_pow_ui(fhsq, fhsq, 2, MPFR_RNDD);
+  mpfr_div(xhsq, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xhsq, xhsq, 2, MPFR_RNDD);
 
   // create result and temp variables
   mpfr_t result, temp;
   mpfr_init2(temp, BITS);
   mpfr_init2(result, BITS);
 
-  mpfr_pow_ui(temp, fh, 2, MPFR_RNDD);
-  mpfr_mul(result, fermiCsq, temp, MPFR_RNDD);
+  mpfr_mul(result, fermiCsq, fhsq, MPFR_RNDD);
   mpfr_mul(result, result, angle, MPFR_RNDD);
   mpfr_pow_ui(temp, HNLmass, 3, MPFR_RNDD);
   mpfr_mul(result, result, temp, MPFR_RNDD);
   mpfr_mul_ui(temp, pi, 32, MPFR_RNDD);
   mpfr_div(result, result, temp, MPFR_RNDD);
 
-  mpfr_pow_ui(temp, xh, 2, MPFR_RNDD);
-  mpfr_ui_sub(temp, 1, temp, MPFR_RNDD);
+  mpfr_ui_sub(temp, 1, xhsq, MPFR_RNDD);
   mpfr_pow_ui(temp, temp, 2, MPFR_RNDD);
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, xh, fh, mesonMass, HNLmass, angle, result, temp, (mpfr_ptr) 0);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, xhsq, fhsq, mesonMass, HNLmass, angle, result, temp, (mpfr_ptr) 0);
 
   return rval;
 }
@@ -369,10 +369,10 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   cfg->getHBAR(HBAR);
 
   // initialize high precision variables
-  mpfr_t xh, xl, fh;
+  mpfr_t xhsq, xlsq, fh;
   mpfr_t mesonMass, alphaMass, HNLmass, angle;
-  mpfr_init2(xh, BITS);
-  mpfr_init2(xl, BITS);
+  mpfr_init2(xhsq, BITS);
+  mpfr_init2(xlsq, BITS);
   mpfr_init2(fh, BITS);
   mpfr_init2(mesonMass, BITS);
   mpfr_init2(alphaMass, BITS);
@@ -385,14 +385,15 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
   mpfr_set_d(fh, m.getDecayConstant(), MPFR_RNDD);
-  mpfr_div(xl, alphaMass, HNLmass, MPFR_RNDD);
-  mpfr_div(xh, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_div(xlsq, alphaMass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xlsq, xlsq, 2, MPFR_RNDD);
+  mpfr_div(xhsq, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xhsq, xhsq, 2, MPFR_RNDD);
 
   // create result and temp variables
-  mpfr_t result, temp, temp2, temp3;
+  mpfr_t result, temp, temp2;
   mpfr_init2(temp, BITS);
   mpfr_init2(temp2, BITS);
-  mpfr_init2(temp3, BITS);
   mpfr_init2(result, BITS);
 
   mpfr_pow_ui(temp, fh, 2, MPFR_RNDD);
@@ -404,14 +405,11 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   mpfr_mul_ui(temp, pi, 16, MPFR_RNDD);
   mpfr_div(result, result, temp, MPFR_RNDD);
 
-  mpfr_pow_ui(temp, xl, 2, MPFR_RNDD);
-  mpfr_ui_sub(temp, 1, temp, MPFR_RNDD);
+  mpfr_ui_sub(temp, 1, xlsq, MPFR_RNDD);
   mpfr_pow_ui(temp, temp, 2, MPFR_RNDD);
 
-  mpfr_pow_ui(temp2, xl, 2, MPFR_RNDD);
-  mpfr_add_ui(temp, temp, 1, MPFR_RNDD);
-  mpfr_pow_ui(temp3, xh, 2, MPFR_RNDD);
-  mpfr_mul(temp2, temp2, temp3, MPFR_RNDD);
+  mpfr_add_ui(temp2, xlsq, 1, MPFR_RNDD);
+  mpfr_mul(temp2, temp2, xhsq, MPFR_RNDD);
   mpfr_sub(temp, temp, temp2, MPFR_RNDD);
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
@@ -419,16 +417,13 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   mpfr_init2(one, BITS);
   mpfr_set_d(one, 1, MPFR_RNDD);
 
-  mpfr_pow_ui(temp2, xh, 2, MPFR_RNDD);
-  mpfr_pow_ui(temp3, xl, 2, MPFR_RNDD);
-
-  kaellen(cfg, temp, one, temp2, temp3);
+  kaellen(cfg, temp, one, xhsq, xlsq);
   mpfr_sqrt(temp, temp, MPFR_RNDD);
 
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, xh, xl, fh, mesonMass, alphaMass, HNLmass, angle, result, temp, temp2, temp3, one, (mpfr_ptr) 0);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, xhsq, xlsq, fh, mesonMass, alphaMass, HNLmass, angle, result, temp, temp2, one, (mpfr_ptr) 0);
 
   return rval;
 }
