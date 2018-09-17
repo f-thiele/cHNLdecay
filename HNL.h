@@ -1,3 +1,5 @@
+// Copyright (C) 2018 - Fabian A.J. Thiele, <fabian.thiele@cern.ch>
+
 #ifndef   HNL_H
 #define   HNL_H
 
