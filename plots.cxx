@@ -40,26 +40,26 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
       cfg->getPi(pi);
       cfg->getVUDsq(VUDsq);
 
-      mpfr_t temp,factor, mesonMass, HNLmass, angle, gh;
+      mpfr_t temp,factor, mesonMass, HNLmass, angle, ghsq;
 
       mpfr_init2(temp, BITS);
       mpfr_init2(factor, BITS);
       mpfr_init2(mesonMass, BITS);
       mpfr_init2(HNLmass, BITS);
       mpfr_init2(angle, BITS);
-      mpfr_init2(gh, BITS);
+      mpfr_init2(ghsq, BITS);
 
       mpfr_set_d(mesonMass, m.getMass(), MPFR_RNDD);
       mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
       mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
-      mpfr_set_d(gh, m.getDecayConstant(), MPFR_RNDD);
+      mpfr_set_d(ghsq, m.getDecayConstant(), MPFR_RNDD);
+      mpfr_pow_ui(ghsq, ghsq, 2, MPFR_RNDD);
 
       // calculate first factors NZ * GF^2 * M^5 * U^2/(192*pi^3)
       mpfr_pow_ui(factor, HNLmass, 3, MPFR_RNDD);
       mpfr_mul(factor, factor, angle, MPFR_RNDD);
       mpfr_mul(factor, factor, VUDsq, MPFR_RNDD);
-      mpfr_pow_ui(temp, gh, 2, MPFR_RNDD);
-      mpfr_mul(factor, factor, temp, MPFR_RNDD);
+      mpfr_mul(factor, factor, ghsq, MPFR_RNDD);
       mpfr_mul(factor, factor, fermiCsq, MPFR_RNDD);
       mpfr_pow_ui(temp, mesonMass, 2, MPFR_RNDD);
       mpfr_mul(temp, temp, pi, MPFR_RNDD);

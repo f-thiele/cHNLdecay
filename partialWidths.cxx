@@ -448,11 +448,11 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
   cfg->getHBAR(HBAR);
 
   // initialize high precision variables
-  mpfr_t xhsq, xlsq, gh;
+  mpfr_t xhsq, xlsq, ghsq;
   mpfr_t mesonMass, alphaMass, HNLmass, angle;
   mpfr_init2(xhsq, BITS);
   mpfr_init2(xlsq, BITS);
-  mpfr_init2(gh, BITS);
+  mpfr_init2(ghsq, BITS);
   mpfr_init2(mesonMass, BITS);
   mpfr_init2(alphaMass, BITS);
   mpfr_init2(HNLmass, BITS);
@@ -463,7 +463,8 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
   mpfr_set_d(alphaMass, alpha.getMass(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
-  mpfr_set_d(gh, m.getDecayConstant(), MPFR_RNDD);
+  mpfr_set_d(ghsq, m.getDecayConstant(), MPFR_RNDD);
+  mpfr_pow_ui(ghsq, ghsq, 2, MPFR_RNDD);
   mpfr_div(xlsq, alphaMass, HNLmass, MPFR_RNDD);
   mpfr_pow_ui(xlsq, xlsq, 2, MPFR_RNDD);
   mpfr_div(xhsq, mesonMass, HNLmass, MPFR_RNDD);
@@ -475,8 +476,7 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
   mpfr_init2(temp2, BITS);
   mpfr_init2(result, BITS);
 
-  mpfr_pow_ui(temp, gh, 2, MPFR_RNDD);
-  mpfr_mul(result, fermiCsq, temp, MPFR_RNDD);
+  mpfr_mul(result, fermiCsq, ghsq, MPFR_RNDD);
   mpfr_mul(result, result, VUDsq, MPFR_RNDD);
   mpfr_mul(result, result, angle, MPFR_RNDD);
   mpfr_pow_ui(temp, HNLmass, 3, MPFR_RNDD);
@@ -509,7 +509,7 @@ Double_t pw_charged_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
   mpfr_mul(result, result, temp, MPFR_RNDD);
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, one, result, temp, temp2, xhsq, xlsq, gh, mesonMass, alphaMass, HNLmass, angle, (mpfr_ptr) 0);
+  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, one, result, temp, temp2, xhsq, xlsq, ghsq, mesonMass, alphaMass, HNLmass, angle, (mpfr_ptr) 0);
 
   return rval;
 }
