@@ -176,6 +176,7 @@ Double_t ctauToU2(std::shared_ptr<Config> cfg, Double_t target, const std::vecto
   for(Double_t angle = start; abs(target-ctau)>tol; angle*=stepsize) {
     iterations++;
     N.setAngle(angle);
+    prev_ctau = ctau;
     ctau = gamma2ctau(cfg, N.getTotalWidth(cfg, leptons, mesons));
     if(abs(target-ctau) > abs(target-prev_ctau)) {
       LOG_WARNING("Stopped at angle=" << angle << " with ctau=" << ctau << " as distance increased to previous ctau=" << prev_ctau);
