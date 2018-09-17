@@ -6,4 +6,5 @@ cHNLdecay
 *.fls
 *.log
 *.synctex.gz
+*.out
 auto
