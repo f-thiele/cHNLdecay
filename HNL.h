@@ -77,7 +77,7 @@ class HNL {
     return majorana;
   }
 
-  void setMajoarana(bool val) {
+  void setMajorana(bool val) {
     majorana = val;
   }
 
