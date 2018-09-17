@@ -353,7 +353,7 @@ Double_t pw_charged_pseudoscalar_mesons(std::shared_ptr<Config> cfg, const Lepto
   if(not N.mixesWith(alpha)) return 0;
   if(N.getMass() < alpha.getMass() + m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
-   mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
+  mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
