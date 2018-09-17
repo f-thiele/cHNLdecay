@@ -88,7 +88,7 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
     TGraph* g = new TGraph(res_m.size(), &(res_m[0]), &(meson_pws.at(m.getName())[0]));
     g->SetLineColor(style);
     style++;
-    leg->AddEntry(g, m.getName());
+    leg->AddEntry(g, alpha.getName()+m.getName());
     graphs.emplace_back(g);
   }
   bool first = true;
