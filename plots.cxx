@@ -69,6 +69,8 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson>
 
       // end calculation first factors
       Double_t Gamma0 =mpfr_get_d(factor, MPFR_RNDD);
+
+      mpfr_clears(fermiC, fermiCsq, pi, VUDsq, mesonMass, HNLmass, angle, factor, temp, ghsq, (mpfr_ptr) 0);
       LOG_DEBUG("Gamma0:" << Gamma0);
       LOG_DEBUG("pw:" << pw);
       LOG_DEBUG("mass: " << mass << " -- " << pw/Gamma0);
