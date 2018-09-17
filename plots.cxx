@@ -183,3 +183,134 @@ void plot_qcd_coupling(TString output) {
   delete c1;
   delete f;
 }
+
+void plot_qcd_correction(TString output) {
+  TF1* f = new TF1("#Delta_{QCD}", f_qcd_correction, 1, 5, 0);
+  f->SetMinimum(0);
+  f->SetMaximum(0.35);
+  TCanvas* c1 = new TCanvas();
+  f->Draw();
+  c1->SaveAs(output);
+  delete f;
+  delete c1;
+}
+
+void plot_br_low(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize) {
+
+  std::map<TString, std::vector<Meson>> plot_sep;
+  std::vector<Meson> v_pi = {Meson("\\pi^+", 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged),
+                             Meson("\\pi^0", 134.9766, 130.2, MesonType::pseudoscalar, Charge::neutral)};
+  plot_sep["pi"] = v_pi;
+
+  std::vector<Meson> v_K = {Meson("K^+", 493.677, 155.6, MesonType::pseudoscalar, Charge::charged)};
+  plot_sep["K"] = v_K;
+
+  std::vector<Meson> v_eta = {Meson("\\eta", 547.862, 81.7, MesonType::pseudoscalar, Charge::neutral),
+                              Meson("\\eta'", 957.78, -94.7, MesonType::pseudoscalar, Charge::neutral),
+                              Meson("\\eta_c", 2983.6, 237, MesonType::pseudoscalar, Charge::neutral)};
+  plot_sep["eta"] = v_eta;
+
+  std::vector<Meson> v_rho = {Meson("\\rho", 775.11, 162000, MesonType::vector, Charge::charged),
+                              Meson("\\rho^0", 775.26, 162000, MesonType::vector, Charge::neutral)};
+  plot_sep["rho"] = v_rho;
+
+  std::vector<Double_t> res_m;
+
+  std::map<TString, TGraph*> graphs;
+  std::map<TString, std::vector<Double_t>> res_values;
+  std::map<TString, Double_t> tws;
+
+  for(auto entry : plot_sep) {
+    res_values[entry.first] = {};
+    graphs[entry.first] = nullptr;
+    tws[entry.first] = 0;
+  }
+
+  std::vector<Double_t> res_lep;
+  std::vector<Double_t> res_inv;
+
+  for(Int_t mass = lowMass; mass < highMass; mass+=stepsize) {
+    N.setMass(mass);
+    for(auto entry : plot_sep) {
+      tws[entry.first] = 0; // zero the accoumulated widths for new mass
+    }
+
+    Double_t tw_mes = 0;
+    Double_t tw_lep = 0;
+    Double_t tw_inv = 0;
+    for(auto l1 : leptons) {
+      for(auto l2 : leptons) {
+        tw_lep += N.getPartialWidth(cfg, l1, l2, false);
+        tw_inv += N.getPartialWidthInv(cfg, l1, l2);
+      }
+      for(auto m : mesons) {
+        Double_t t_pw = N.getPartialWidth(cfg, l1, m);
+        tw_mes += t_pw;
+        for(auto entry : plot_sep) {
+          for(auto c_m : entry.second) {
+            if(m == c_m) tws.at(entry.first) += t_pw;
+          }
+        }
+      }
+    }
+    res_m.emplace_back(mass);
+    Double_t tot = tw_mes + tw_lep + tw_inv;
+
+    for(auto entry : plot_sep)
+      res_values.at(entry.first).emplace_back(tws.at(entry.first)/tot);
+
+    res_lep.emplace_back(tw_lep/tot);
+    res_inv.emplace_back(tw_inv/tot);
+  }
+
+  TCanvas* c1 = new TCanvas("c1", "c1", 500, 400);
+
+  Short_t lc = 1;
+
+  for(auto entry : plot_sep) {
+    graphs.at(entry.first) = new TGraph(res_m.size(), &(res_m[0]), &(res_values.at(entry.first)[0]));
+    graphs.at(entry.first)->SetLineColor(lc);
+    graphs.at(entry.first)->SetLineWidth(2);
+    lc++;
+  }
+
+
+  TGraph* g_lep = new TGraph(res_m.size(), &(res_m[0]), &(res_lep[0]));
+  TGraph* g_inv = new TGraph(res_m.size(), &(res_m[0]), &(res_inv[0]));
+
+  g_lep->SetLineColor(kRed);
+  g_lep->SetLineWidth(2);
+  g_lep->SetLineStyle(9);
+  g_inv->SetLineColor(kGreen);
+  g_inv->SetLineWidth(2);
+  g_inv->SetLineStyle(7);
+
+  TLegend* leg = new TLegend(0.15, 0.15, 0.6, 0.3);
+  leg->AddEntry(g_lep, "leptons");
+  leg->AddEntry(g_inv, "invisible");
+  for(auto entry: plot_sep) {
+    leg->AddEntry(graphs.at(entry.first), entry.first);
+  }
+  c1->SetLogy();
+  c1->SetLogx();
+
+  bool isFirst = true;
+  for(auto entry : plot_sep) {
+    if(isFirst) {
+      graphs.at(entry.first)->Draw("AL");
+      graphs.at(entry.first)->GetYaxis()->SetRangeUser(0.0001, 1);
+      isFirst = false;
+    } else {
+      graphs.at(entry.first)->Draw("SAME");
+    }
+  }
+  g_lep->Draw("SAME");
+  g_inv->Draw("SAME");
+  leg->Draw();
+  c1->SaveAs(output);
+  delete leg;
+  delete c1;
+  for(auto entry : plot_sep) {
+    delete graphs.at(entry.first);
+  }
+}
