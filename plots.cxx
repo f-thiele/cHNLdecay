@@ -174,9 +174,8 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vect
   delete g_inv;
 }
 
-void plot_qcd_correction(TString output) {
-  TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1000, 5000, 0);
-  f->SetMaximum(0.35);
+void plot_qcd_coupling(TString output) {
+  TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1, 100, 0);
   f->SetMinimum(0);
   TCanvas* c1 = new TCanvas("c1", "c1", 500, 400);
   f->Draw();

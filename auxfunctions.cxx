@@ -113,23 +113,33 @@ Double_t qcd_coupling(Double_t* x, Double_t* par) {
   UInt_t nf = 6;
   Double_t beta0 = (11.*nc-2.*nf)/(12*TMath::Pi());
 
-  Double_t alpha_mu = 0.1184;
-  Double_t mu = 91.1876;
+  // Double_t alpha_mu = 0.1184;
+  // Double_t mu = 91.1876;
+  Double_t alpha_mu = 0.31593;
+  Double_t mu = 1.776;
   return alpha_mu/(1.+beta0*alpha_mu*TMath::Log(x[0]*x[0]/(mu*mu)));
 }
-void plot_qcd_coupling() {
+
+Double_t qcd_coupling(Double_t mass) {
   TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1, 100, 0);
-  TCanvas* c1 = new TCanvas();
-  c1->SetLogx();
-  f->Draw();
-  c1->SaveAs("qcd_coupling.pdf");
+  Double_t ret = f->Eval(mass);
   delete f;
-  delete c1;
+  return ret;
 }
 
+
 Double_t qcd_correction(Double_t alpha) {
-  return alpha/TMath::Pi()+5.2*alpha*alpha/TMath::Power(TMath::Pi(), 2)+26.4*TMath::Power(alpha/TMath::Pi(), 3);
+  return alpha/TMath::Pi()+5.2*TMath::Power(alpha/TMath::Pi(), 2)+26.4*TMath::Power(alpha/TMath::Pi(), 3);
 }
+
+Double_t f_qcd_correction(Double_t* x, Double_t* par) {
+  TF1* f = new TF1("#alpha_{s}", qcd_coupling, 1, 100, 0);
+  Double_t alpha = f->Eval(x[0]);
+  delete f;
+
+  return alpha/TMath::Pi()+5.2*TMath::Power(alpha/TMath::Pi(), 2)+26.4*TMath::Power(alpha/TMath::Pi(), 3);
+}
+
 
 TGraph* create_graph(Double_t xd, Double_t xl, Float_t low, Float_t high, Float_t stepsize) {
   std::vector<Double_t> res_x;

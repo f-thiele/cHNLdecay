@@ -94,14 +94,23 @@ int main() {
     vector_charged.emplace_back(m);
   }
 
+  TF1* f = new TF1("#Delta_{QCD}", qcd_coupling, 1, 100, 0);
+  Double_t qcd_corr = qcd_correction(f->Eval(1776/1000.));
+  LOG_INFO("QCD correction at tau mass: " << qcd_corr);
+  LOG_INFO("QCD correction at 20 GeV: " << qcd_correction(f->Eval(20000/1000.)));
+  LOG_INFO("QCD coupling at tau: " << qcd_coupling(1776./1000.));
+  LOG_INFO("QCD coupling at Z mass: " << qcd_coupling(91.2));
+  delete f;
+
   N.setMass(3000);
   LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));
 
   plot_meson_pw(cfg, mu, vector_charged, N, "mesons_vector_charged.pdf", 500, 5000);
   plot_I();
   plot_br(cfg, all_leptons, mesons, N, "BR.pdf", 1000, 5000);
-  plot_qcd_correction("qcd_corr.pdf");
 
+  plot_qcd_correction("qcd_corr.pdf");
+  plot_qcd_coupling("qcd_coupl.pdf");
 
   return EXIT_SUCCESS;
 }
