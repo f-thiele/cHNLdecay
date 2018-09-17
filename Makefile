@@ -3,15 +3,19 @@ CXX = g++
 RM = rm -f
 CPPFLAGS = -g $(shell root-config --cflags) -I/usr/include
 LDFLAGS = -g $(shell root-config --ldflags)
-LDLIBS = $(shell root-config --libs) -lmpfr -lgmp -L/usr/lib
+LDLIBS = $(shell root-config --libs) -lmpfr -lgmp -L/usr/lib -L/usr/lib64
+LDLIBS_DBG = $(shell root-config --libs) -lmpfr -lgmp -L/usr/lib -L/usr/lib64 -lprofiler -ltcmalloc
 
 SRCS = $(wildcard *.cxx)
 OBJS = $(SRCS:.cxx=.o)
 
 all: cHNLdecay
 
+debug: $(OBJS)
+	$(CXX) $(LDFLAGS) -o cHNLdecay $(OBJS) $(LDLIBS_DBG) -ggdb
+
 cHNLdecay: $(OBJS)
-	$(CXX) $(LDFLAGS) -o cHNLdecay $(OBJS) $(LDLIBS) -ggdb
+	$(CXX) $(LDFLAGS) -o cHNLdecay $(OBJS) $(LDLIBS)
 
 # To obtain object files
 %.o: %.cxx
