@@ -217,14 +217,14 @@ int main (int argc, char **argv)
   plot_meson_pw(cfg, mu, vector_charged, N, "mesons_vector_charged.pdf", 500, 5000);
   N.setMajorana(isMajorana); // restore majorana value
 
-  LOG_INFO("Searching now for U2 for 0.1 mm ctau... This might take a while!");
-  Double_t foundU2 = ctauToU2(cfg, 0.1, all_leptons, mesons, N);
-  LOG_INFO(std::endl << "FOUND U2: " << foundU2);
-
   // EXAMPLE for further checks and configurations
   // ----------
   // N.setMass(3000);
   // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));
+  // LOG_INFO("Searching now for U2 for 0.1 mm ctau... This might take a while!");
+  // Double_t foundU2 = ctauToU2(cfg, 0.1, all_leptons, mesons, N);
+  // LOG_INFO(std::endl << "FOUND U2: " << foundU2);
+
 
 
   return EXIT_SUCCESS;
