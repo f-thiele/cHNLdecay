@@ -4,36 +4,12 @@
 #define   LEPTON_H
 
 #include "TString.h"
+#include "Particle.h"
 
-class Lepton {
- public:
-  Lepton() {
-    name = "";
-    mass = 0;
-  }
-  Lepton(TString n, Double_t m) {
-    name = n;
-    mass = m;
-  }
-  Lepton(const Lepton &obj) {
-    name = obj.getName();
-    mass = obj.getMass();
-  }
-
-  Double_t getMass() const {
-    return mass;
-  }
-  TString getName() const {
-    return name;
-  }
-
-  bool operator==(const Lepton& a) const {
-    return getMass() == a.getMass(); // true if they have same masses false otherwise
-  }
-
- private:
-  TString name;
-  Double_t mass;
-
+class Lepton: public Particle {
+  public:
+    Lepton() : Particle() {}
+    Lepton(Int_t p, TString n, Double_t m) : Particle(p, n, m) {}
+    Lepton(const Lepton &obj) : Particle(obj) {}
 };
 #endif

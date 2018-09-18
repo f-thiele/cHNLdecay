@@ -4,31 +4,26 @@
 #define   MESON_H
 #include <map>
 #include "TString.h"
+#include "Particle.h"
 
 enum class MesonType { Unknown, pseudoscalar, vector };
 enum class Charge { Unknown, charged, neutral };
 
-class Meson {
+class Meson: public Particle {
 public:
-  Meson() {
-    name = "";
-    mass = 0;
+  Meson() : Particle() {
     decayConstant = 0;
     vals = {};
     charge = Charge::Unknown;
     type = MesonType::Unknown;
   }
-  Meson(TString n, Double_t m, Double_t c, MesonType t, Charge q) {
-    name = n;
-    mass = m;
+  Meson(Int_t p, TString n, Double_t m, Double_t c, MesonType t, Charge q) : Particle(p, n, m) {
     decayConstant = c;
     vals = {};
     charge = q;
     type = t;
   }
-  Meson(const Meson &obj) {
-    name          = obj.getName();
-    mass          = obj.getMass();
+  Meson(const Meson &obj) : Particle(obj) {
     decayConstant = obj.getDecayConstant();
     vals          = obj.getValueMap();
     charge        = obj.getCharge();
@@ -36,18 +31,11 @@ public:
   }
 
   MesonType getMesonType() const {
-          return type;
+    return type;
   }
 
   Charge getCharge() const {
-          return charge;
-  }
-
-  Double_t getMass() const {
-    return mass;
-  }
-  TString getName() const {
-    return name;
+    return charge;
   }
 
   Double_t getDecayConstant() const {
@@ -70,13 +58,7 @@ public:
           return vals;
   }
 
-  bool operator==(const Meson& a) const {
-    return getMass() == a.getMass(); // true if they have same masses false otherwise
-  }
-
 private:
-  TString name;
-  Double_t mass;
   Double_t decayConstant;
   std::map<TString, Double_t> vals;
   MesonType type;

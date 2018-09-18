@@ -17,7 +17,7 @@ class HNL {
     name = n;
     mass = m;
     angle = U2;
-    generation.emplace_back(Lepton(a.getName(), a.getMass()));
+    generation.emplace_back(Lepton(a.getPdgId(), a.getName(), a.getMass()));
     dc_c;
     majorana = true;
   }
@@ -26,7 +26,7 @@ class HNL {
     mass = m;
     angle = U2;
     for(auto l : a) {
-      generation.emplace_back(Lepton(l.getName(), l.getMass()));
+      generation.emplace_back(Lepton(l.getPdgId(), l.getName(), l.getMass()));
     }
     dc_c;
 
