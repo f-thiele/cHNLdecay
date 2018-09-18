@@ -200,7 +200,7 @@ void plot_qcd_correction(TString output) {
 void plot_br_low(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize) {
 
   std::map<TString, std::vector<Meson>> plot_sep;
-  std::vector<Meson> v_pi = {Meson(221, "\\pi^+", 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged),
+  std::vector<Meson> v_pi = {Meson(211, "\\pi^+", 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged),
                              Meson(111, "\\pi^0", 134.9766, 130.2, MesonType::pseudoscalar, Charge::neutral)};
   plot_sep["pi"] = v_pi;
 
