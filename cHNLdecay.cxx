@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <iomanip>
+#include <fstream>
 
 Level gLOGLEVEL;
 int main (int argc, char **argv)
@@ -192,19 +193,27 @@ int main (int argc, char **argv)
     }
   }
 
+  std::ofstream lxf("decaychannels.txt");
   for (auto it=ch.begin(); it!=ch.end(); ++it) {
     if(it->second > 0) {
+      lxf << "\\Gamma(";
       for(Int_t index = 0; index<longest_channel; ++index) {
         if(index < (it->first).size()) {
           Int_t p = (it->first).at(index);
-          std::cout << std::setw(9*(1+index)) << pdgIdToLaTeX(p);
+          std::cout << std::setw(9*(1+index)) << p;
+          lxf << std::setw(9*(1+index)) << pdgIdToLaTeX(p);
         } else {
           std::cout << std::setw(9*(1+index)) << " ";
+          lxf << std::setw(9*(1+index)) << " ";
         }
       }
+      lxf << ") = \\SI{";
       std::cout << std::setw(9*longest_channel) << it->second << std::endl;
+      lxf << std::setw(9*longest_channel) << it->second;
+      lxf << "}{\\MeV} \\\\" << std::endl;
     }
   }
+  lxf.close();
 
 
   plot_br_low(cfg, all_leptons, mesons, N, "BR_low.pdf", 50, 1000, 1);
