@@ -185,8 +185,12 @@ int main (int argc, char **argv)
 
   auto ch = N.getDecayChannels();
   for (auto it=ch.begin(); it!=ch.end(); ++it) {
-    if(it->second > 0)
-      std::cout << "\\Gamma(" << it->first << ") = \\SI{" << it->second << "}{}\\\\\n";
+    if(it->second > 0) {
+      for(auto p : it->first) {
+        std::cout << "\t" << p;
+      }
+      std::cout << "\t" << it->second << std::endl;
+    }
   }
 
 

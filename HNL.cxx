@@ -23,11 +23,11 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, 
 
   if(invisible) {
     nununu += std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
+    this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId()+1, beta.getPdgId()+1, -(beta.getPdgId()+1)}, nununu);
   }
 
-  this->newDecayChannel("\\nu_" + alpha.getName() + ", " + beta.getName() + ", " + beta.getName(), nua_lb_lb);
-  this->newDecayChannel(alpha.getName() + "^-, " + beta.getName() + ", \\nu_" + beta.getName(), la_lb_nub);
-  this->newDecayChannel("\\nu_" + alpha.getName() + ", \\nu_" + beta.getName() + ", \\nu_" + beta.getName(), nununu);
+  this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId()+1, beta.getPdgId(),   -beta.getPdgId()}, nua_lb_lb);
+  this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(),   -beta.getPdgId(),   beta.getPdgId()+1}, la_lb_nub);
 
   Double_t pw = nununu + nua_lb_lb + charge_factor * la_lb_nub;
 
@@ -38,10 +38,7 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, 
 Double_t HNL::getPartialWidthInv(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta) {
   Double_t nununu = std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
 
-  TString channel_name = "\\nu_" + alpha.getName() + ", \\nu_" + beta.getName() + ", \\nu_" + beta.getName();
-  if(not existDecayChannel(name)) {
-    this->newDecayChannel(name, nununu);
-  }
+  this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId()+1, beta.getPdgId()+1, -(beta.getPdgId()+1)}, nununu);
 
   return nununu;
 }
@@ -57,25 +54,25 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, 
 
   if(m.getMesonType() == MesonType::pseudoscalar and m.getCharge() == Charge::charged) {
     temp = std::max(0., pw_charged_pseudoscalar_mesons(cfg, alpha, m, *this));
-    this->newDecayChannel(alpha.getName() + "^-, " + m.getName(), temp);
+    this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(), m.getPdgId()}, temp);
 
     dw += charge_factor*temp;
 
   } else if (m.getMesonType() == MesonType::pseudoscalar and m.getCharge() == Charge::neutral) {
     temp = std::max(0., pw_neutral_pseudoscalar_mesons(cfg, alpha, m, *this));
-    this->newDecayChannel("\\nu_" + alpha.getName() + ", " + m.getName(), temp);
+    this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId()+1, m.getPdgId()}, temp);
 
     dw += temp;
 
   } else if (m.getMesonType() == MesonType::vector and m.getCharge() == Charge::charged) {
     temp = std::max(0., pw_charged_vector_mesons(cfg, alpha, m, *this));
-    this->newDecayChannel(alpha.getName() + "^-, " + m.getName(), temp);
+    this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(), m.getPdgId()}, temp);
 
     dw += charge_factor*temp;
 
   } else if (m.getMesonType() == MesonType::vector and m.getCharge() == Charge::neutral) {
     temp = std::max(0., pw_neutral_vector_mesons(cfg, alpha, m, *this));
-    this->newDecayChannel("\\nu_" + alpha.getName() + ", " + m.getName(), temp);
+    this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId()+1, m.getPdgId()}, temp);
 
     dw += temp;
 

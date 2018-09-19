@@ -63,12 +63,12 @@ class HNL {
     return name;
   }
 
-  void newDecayChannel(TString name, Double_t value) {
-    dc_c.insert(std::pair<TString, Double_t>(name, value));
+  void newDecayChannel(std::vector<Int_t> particles, Double_t value) {
+    dc_c.insert(std::pair<std::vector<Int_t>, Double_t>(particles, value));
   }
 
-  bool existDecayChannel(TString name) const {
-    return (dc_c.count(name) > 0);
+  bool existDecayChannel(std::vector<Int_t> p) const {
+    return (dc_c.count(p) > 0);
   }
 
   void clearDecayChannels() {
@@ -83,7 +83,7 @@ class HNL {
     majorana = val;
   }
 
-  std::map<TString, Double_t> getDecayChannels() const {
+  std::map<std::vector<Int_t>, Double_t> getDecayChannels() const {
     return dc_c;
   }
 
@@ -101,7 +101,7 @@ class HNL {
   Double_t mass;
   Double_t angle;
   std::vector<Lepton> generation;
-  std::map<TString, Double_t> dc_c; // decay channels stored
+  std::map<std::vector<Int_t>, Double_t> dc_c; // decay channels stored
   bool majorana;
 };
 #endif
