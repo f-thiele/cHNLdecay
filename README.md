@@ -37,7 +37,7 @@ The options are as follows:
 
 And an example would be:
 ```
-./cHNLdecay --generations \\mu,e,\\tau --mass 20000 --angle 3.5e-6
+./cHNLdecay --generations 11,13,15 --mass 20000 --angle 3.5e-6
 ```
 
 ## License
