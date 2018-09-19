@@ -14,6 +14,7 @@
 #include "TF1.h"
 #include "auxfunctions.h"
 #include "Logger.h"
+#include "ParticleCatalogue.h"
 
 void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize=10) {
   std::vector<Double_t> res_m;
@@ -198,22 +199,26 @@ void plot_qcd_correction(TString output) {
 }
 
 void plot_br_low(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass, Int_t highMass, Int_t stepsize) {
+  ParticleCatalogue pc;
 
   std::map<TString, std::vector<Meson>> plot_sep;
-  std::vector<Meson> v_pi = {Meson(211, "\\pi^+", 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged),
-                             Meson(111, "\\pi^0", 134.9766, 130.2, MesonType::pseudoscalar, Charge::neutral)};
+  std::vector<Meson> v_pi = {pc.getMeson(211), // pi+
+                             pc.getMeson(111)  // pi0
+  };
   plot_sep["pi"] = v_pi;
 
-  std::vector<Meson> v_K = {Meson(321, "K^+", 493.677, 155.6, MesonType::pseudoscalar, Charge::charged)};
+  std::vector<Meson> v_K = {pc.getMeson(321)}; // K+
   plot_sep["K"] = v_K;
 
-  std::vector<Meson> v_eta = {Meson(221, "\\eta", 547.862, 81.7, MesonType::pseudoscalar, Charge::neutral),
-                              Meson(958, "\\eta'", 957.78, -94.7, MesonType::pseudoscalar, Charge::neutral),
-                              Meson(441, "\\eta_c", 2983.6, 237, MesonType::pseudoscalar, Charge::neutral)};
+  std::vector<Meson> v_eta = {pc.getMeson(221), // eta
+                              pc.getMeson(958), // eta prime
+                              pc.getMeson(441)  // eta c
+  };
   plot_sep["eta"] = v_eta;
 
-  std::vector<Meson> v_rho = {Meson(213, "\\rho", 775.11, 162000, MesonType::vector, Charge::charged),
-                              Meson(113, "\\rho^0", 775.26, 162000, MesonType::vector, Charge::neutral)};
+  std::vector<Meson> v_rho = {pc.getMeson(213), // rho+
+                              pc.getMeson(113)  // rho0
+  };
   plot_sep["rho"] = v_rho;
 
   std::vector<Double_t> res_m;

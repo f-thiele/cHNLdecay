@@ -17,7 +17,7 @@ public:
     charge = Charge::Unknown;
     type = MesonType::Unknown;
   }
-  Meson(Int_t p, TString n, Double_t m, Double_t c, MesonType t, Charge q) : Particle(p, n, m) {
+  Meson(Int_t p, Double_t m, Double_t c, MesonType t, Charge q) : Particle(p, m) {
     decayConstant = c;
     vals = {};
     charge = q;

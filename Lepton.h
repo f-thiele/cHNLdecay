@@ -9,7 +9,7 @@
 class Lepton: public Particle {
   public:
     Lepton() : Particle() {}
-    Lepton(Int_t p, TString n, Double_t m) : Particle(p, n, m) {}
+    Lepton(Int_t p, Double_t m) : Particle(p, m) {}
     Lepton(const Lepton &obj) : Particle(obj) {}
 };
 #endif

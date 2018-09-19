@@ -21,6 +21,7 @@
 #include "partialWidths.h"
 #include "plots.h"
 #include "Logger.h"
+#include "ParticleCatalogue.h"
 #include <stdlib.h>
 #include <getopt.h>
 #include <iomanip>
@@ -39,43 +40,10 @@ int main (int argc, char **argv)
   // sensible default for loglevel
   gLOGLEVEL = Level::INFO;
 
-  Double_t muonMass = 105.6583715; // MeV
-  Double_t electronMass = 0.5109989461; // MeV
-  Double_t tauMass = 1776.82; // MeV
+  ParticleCatalogue pc;
 
-  Lepton mu = Lepton(13, "\\mu", muonMass);
-  Lepton el = Lepton(11, "e", electronMass);
-  Lepton tau = Lepton(15, "\\tau", tauMass);
-  std::vector<Lepton> all_leptons = {el, mu, tau};
-
-  Meson pi = Meson(211,"\\pi^+", 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged);
-  Meson K = Meson(321, "K^+", 493.677, 155.6, MesonType::pseudoscalar, Charge::charged);
-  Meson D = Meson(411, "D", 1869.62, 212, MesonType::pseudoscalar, Charge::charged);
-  Meson Ds = Meson(431, "D_s", 1968.47, 249, MesonType::pseudoscalar, Charge::charged);
-  Meson B = Meson(521, "B", 5279.29, 187, MesonType::pseudoscalar, Charge::charged);
-  Meson Bc = Meson(541, "B_c", 6275.1, 434, MesonType::pseudoscalar, Charge::charged);
-
-  Meson pi0 = Meson(111, "\\pi^0", 134.9766, 130.2, MesonType::pseudoscalar, Charge::neutral);
-  Meson eta = Meson(221, "\\eta", 547.862, 81.7, MesonType::pseudoscalar, Charge::neutral);
-  Meson etaprime = Meson(958, "\\eta'", 957.78, -94.7, MesonType::pseudoscalar, Charge::neutral);
-  Meson etac = Meson(441, "\\eta_c", 2983.6, 237, MesonType::pseudoscalar, Charge::neutral);
-
-  Meson rho = Meson(213, "\\rho", 775.11, 162000, MesonType::vector, Charge::charged);
-  Meson Dstar = Meson(413, "D^{\\ast+}", 2010.26, 535000, MesonType::vector, Charge::charged);
-  Meson Dstars = Meson(431, "D^{\\ast+}_s", 2112.1, 650000, MesonType::vector, Charge::charged);
-
-
-  Double_t weinberg = 0.2223;
-  Meson rho0 = Meson(113, "\\rho^0", 775.26, 162000, MesonType::vector, Charge::neutral);
-  rho0.insertValue("kh", 1.-2.*weinberg);
-  Meson omega = Meson(223, "\\omega", 782.65, 153000, MesonType::vector, Charge::neutral);
-  omega.insertValue("kh", 4./3.*weinberg);
-  Meson phi = Meson(333, "\\phi", 1019.461, 234000, MesonType::vector, Charge::neutral);
-  phi.insertValue("kh", (4./3.*weinberg)-1.);
-  Meson jpsi = Meson(443, "J/\\Psi", 3096.916, 1290000, MesonType::vector, Charge::neutral);
-  jpsi.insertValue("kh", 1.-8./3.*weinberg);
-
-  std::vector<Meson> mesons = {pi, K, D, Ds, B, Bc, pi0, eta, etaprime, etac, rho, Dstar, Dstars, rho0, omega, phi, jpsi};
+  std::vector<Lepton> all_leptons = pc.getAllLeptons();
+  std::vector<Meson> mesons = pc.getAllMesons();
 
   while (1)
     {
@@ -241,7 +209,7 @@ int main (int argc, char **argv)
 
   bool isMajorana = N.isMajorana();
   N.setMajorana(false); // disable majorana here because we want to compare the pw for one charge configuration only
-  plot_meson_pw(cfg, mu, vector_charged, N, "mesons_vector_charged.pdf", 500, 5000);
+  plot_meson_pw(cfg, pc.getLepton(13), vector_charged, N, "mesons_vector_charged.pdf", 500, 5000);
   N.setMajorana(isMajorana); // restore majorana value
 
   // EXAMPLE for further checks and configurations
