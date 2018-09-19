@@ -136,8 +136,9 @@ int main (int argc, char **argv)
 
             for (Int_t i = 0; i < tx->GetEntries(); i++) {
               TString iter_str = ((TObjString*)tx->At(i))->CopyString();
+
               for(auto l : all_leptons) {
-                if(iter_str.CompareTo(l.getName())==0) mixes_with.emplace_back(l);
+                if(iter_str.Atoi() == l.getPdgId()) mixes_with.emplace_back(l);
               }
             }
           }
