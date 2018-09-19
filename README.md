@@ -20,9 +20,9 @@ The options are as follows:
 
 
 ```
---generations {\\mu,el,\\tau} 
+--generations {11,13,15} 
 ```
-(multiple can be passed separated by a `,` and no whitespace) 
+(multiple can be passed separated by a `,` and no whitespace. The leptons are identified by their PDG ID) 
 
 ```
 --angle FLOAT
