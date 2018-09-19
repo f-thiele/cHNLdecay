@@ -190,6 +190,44 @@ Double_t ctauToU2(std::shared_ptr<Config> cfg, Double_t target, const std::vecto
   return found_angle;
 }
 
+TString pdgIdToLaTeX(Int_t p) {
+  std::map<Int_t, TString> label = {{11, "e^-"},
+                                    {12, "\\nu_e"},
+                                    {13, "\\mu^-"},
+                                    {14, "\\nu_\\mu"},
+                                    {15, "\\tau^-"},
+                                    {16, "\\nu_\\tau"},
+                                    {211,"\\pi^+"},
+                                    {321, "K^+"},
+                                    {411, "D^+"},
+                                    {431, "D_s^+"},
+                                    {521, "B^+"},
+                                    {541, "B_c^+"},
+                                    {111, "\\pi^0"},
+                                    {221, "\\eta"},
+                                    {958, "\\eta'"},
+                                    {441, "\\eta_c"},
+                                    {213, "\\rho^+"},
+                                    {413, "D^{\\ast+}"},
+                                    {431, "D^{\\ast+}_s"},
+                                    {113, "\\rho^0"},
+                                    {223, "\\omega"},
+                                    {333, "\\phi"},
+                                    {443, "J/\\Psi"}
+  };
+
+  if(p>0) return label.at(p);
+  else if(p<0) {
+    TString ret = label.at(-p);
+    if(ret.Contains("+")) ret.ReplaceAll("+", "-");
+    else if (ret.Contains("-")) ret.ReplaceAll("-", "+");
+    else ret = TString("\\bar{"+ret+"}");
+
+    return ret;
+  }
+  return TString("");
+}
+
 void plot_I() {
   TCanvas* c1 = new TCanvas("c1", "c1", 500, 400);
   TGraph* g = create_graph(0.5, 0, 0.1);

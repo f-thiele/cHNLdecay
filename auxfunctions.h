@@ -20,7 +20,7 @@ Double_t qcd_coupling(Double_t mass);
 Double_t qcd_correction(Double_t alpha);
 Double_t f_qcd_correction(Double_t* x, Double_t* par);
 Double_t ctauToU2(std::shared_ptr<Config> cfg, Double_t target, const std::vector<Lepton> &leptons, const std::vector<Meson> &mesons, HNL &N, Double_t start=1e-3, Double_t tol=1e-6, Double_t stepsize=1-1e-4);
-
+TString pdgIdToLaTeX(Int_t p);
 TGraph* create_graph(Double_t xd, Double_t xl, Float_t low=0, Float_t high=0.5, Float_t stepsize=0.001);
 void plot_I();
 #endif

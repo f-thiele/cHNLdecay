@@ -23,6 +23,7 @@
 #include "Logger.h"
 #include <stdlib.h>
 #include <getopt.h>
+#include <iomanip>
 
 Level gLOGLEVEL;
 int main (int argc, char **argv)
@@ -184,12 +185,24 @@ int main (int argc, char **argv)
            "ctau=" << gamma2ctau(cfg, Gamma) << " mm");
 
   auto ch = N.getDecayChannels();
+  Int_t longest_channel = 0;
+  for(auto it=ch.begin(); it!=ch.end(); ++it) {
+    if(longest_channel < (it->first).size()) {
+      longest_channel = (it->first).size();
+    }
+  }
+
   for (auto it=ch.begin(); it!=ch.end(); ++it) {
     if(it->second > 0) {
-      for(auto p : it->first) {
-        std::cout << "\t" << p;
+      for(Int_t index = 0; index<longest_channel; ++index) {
+        if(index < (it->first).size()) {
+          Int_t p = (it->first).at(index);
+          std::cout << std::setw(9*(1+index)) << pdgIdToLaTeX(p);
+        } else {
+          std::cout << std::setw(9*(1+index)) << " ";
+        }
       }
-      std::cout << "\t" << it->second << std::endl;
+      std::cout << std::setw(9*longest_channel) << it->second << std::endl;
     }
   }
 
