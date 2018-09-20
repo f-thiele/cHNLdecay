@@ -520,27 +520,21 @@ Double_t pw_neutral_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
     throw std::runtime_error("Neutral mesons need to have dimensionless kh factor stored as 'kh' value.");
   if(N.getMass() < m.getMass()) return 0; // this means we don't have enough mass in the HNL to produce decay product on-shell
 
-  mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
+  mpfr_t fermiC, fermiCsq, pi;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
   mpfr_init2(pi, BITS);
-  mpfr_init2(VUDsq, BITS);
-  mpfr_init2(SOL, BITS);
-  mpfr_init2(HBAR, BITS);
   cfg->getFermiCsq(fermiCsq);
   cfg->getFermiC(fermiC);
   cfg->getPi(pi);
-  cfg->getVUDsq(VUDsq);
-  cfg->getSOL(SOL);
-  cfg->getHBAR(HBAR);
 
   // initialize high precision variables
-  mpfr_t xh, gh, kh;
+  mpfr_t xhsq, ghsq, khsq;
   mpfr_t mesonMass, HNLmass, angle;
-  mpfr_init2(xh, BITS);
-  mpfr_init2(gh, BITS);
-  mpfr_init2(kh, BITS);
+  mpfr_init2(xhsq, BITS);
+  mpfr_init2(ghsq, BITS);
+  mpfr_init2(khsq, BITS);
   mpfr_init2(mesonMass, BITS);
   mpfr_init2(HNLmass, BITS);
   mpfr_init2(angle, BITS);
@@ -549,41 +543,38 @@ Double_t pw_neutral_vector_mesons(std::shared_ptr<Config> cfg, const Lepton &alp
   mpfr_set_d(mesonMass, m.getMass(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
-  mpfr_set_d(gh, m.getDecayConstant(), MPFR_RNDD);
-  mpfr_set_d(kh, m.getValue("kh"), MPFR_RNDD);
-  mpfr_div(xh, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_set_d(ghsq, m.getDecayConstant(), MPFR_RNDD);
+  mpfr_pow_ui(ghsq, ghsq, 2, MPFR_RNDD);
+  mpfr_set_d(khsq, m.getValue("kh"), MPFR_RNDD);
+  mpfr_pow_ui(khsq, khsq, 2, MPFR_RNDD);
+  mpfr_div(xhsq, mesonMass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xhsq, xhsq, 2, MPFR_RNDD);
 
   // create result and temp variables
-  mpfr_t result, temp, temp2;
+  mpfr_t result, temp;
   mpfr_init2(temp, BITS);
-  mpfr_init2(temp2, BITS);
   mpfr_init2(result, BITS);
 
-  mpfr_pow_ui(temp, gh, 2, MPFR_RNDD);
-  mpfr_pow_ui(temp2, kh, 2, MPFR_RNDD);
-  mpfr_mul(result, fermiCsq, temp, MPFR_RNDD);
-  mpfr_mul(result, result, temp2, MPFR_RNDD);
-  mpfr_mul(result, result, VUDsq, MPFR_RNDD);
+  mpfr_mul(result, fermiCsq, ghsq, MPFR_RNDD);
+  mpfr_mul(result, result, khsq, MPFR_RNDD);
   mpfr_mul(result, result, angle, MPFR_RNDD);
   mpfr_pow_ui(temp, HNLmass, 3, MPFR_RNDD);
   mpfr_mul(result, result, temp, MPFR_RNDD);
-  mpfr_mul_ui(temp, pi, 32, MPFR_RNDD);
-  mpfr_pow_ui(temp2, mesonMass, 2, MPFR_RNDD);
-  mpfr_mul(temp, temp, temp2, MPFR_RNDD);
+  mpfr_pow_ui(temp, mesonMass, 2, MPFR_RNDD);
+  mpfr_mul(temp, temp, pi, MPFR_RNDD);
+  mpfr_mul_ui(temp, temp, 32, MPFR_RNDD);
   mpfr_div(result, result, temp, MPFR_RNDD);
 
-  mpfr_pow_ui(temp, xh, 2, MPFR_RNDD);
-  mpfr_mul_ui(temp, temp, 2, MPFR_RNDD);
+  mpfr_mul_ui(temp, xhsq, 2, MPFR_RNDD);
   mpfr_add_ui(temp, temp, 1, MPFR_RNDD);
-
-  mpfr_pow_ui(temp2, xh, 2, MPFR_RNDD);
-  mpfr_ui_sub(temp2, 1, temp2, MPFR_RNDD);
-  mpfr_pow_ui(temp2, temp2, 2, MPFR_RNDD);
   mpfr_mul(result, result, temp, MPFR_RNDD);
-  mpfr_mul(result, result, temp2, MPFR_RNDD);
+
+  mpfr_ui_sub(temp, 1, xhsq, MPFR_RNDD);
+  mpfr_pow_ui(temp, temp, 2, MPFR_RNDD);
+  mpfr_mul(result, result, temp, MPFR_RNDD);
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, result, temp, temp2, xh, gh, kh,mesonMass, HNLmass, angle, (mpfr_ptr) 0);
+  mpfr_clears(fermiC, fermiCsq, pi, result, temp, xhsq, ghsq, khsq, mesonMass, HNLmass, angle, (mpfr_ptr) 0);
 
   return rval;
 }
