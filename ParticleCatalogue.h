@@ -37,7 +37,7 @@ public:
     addTo(pi0);
     Meson eta =  Meson(221,  547.862, 81.7, MesonType::pseudoscalar, Charge::neutral);
     addTo(eta);
-    Meson etaprime =  Meson(958,  957.78, -94.7, MesonType::pseudoscalar, Charge::neutral);
+    Meson etaprime =  Meson(331,  957.78, -94.7, MesonType::pseudoscalar, Charge::neutral);
     addTo(etaprime);
     Meson etac =  Meson(441,  2983.6, 237, MesonType::pseudoscalar, Charge::neutral);
     addTo(etac);

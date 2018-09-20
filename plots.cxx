@@ -211,7 +211,7 @@ void plot_br_low(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons, std::
   plot_sep["K"] = v_K;
 
   std::vector<Meson> v_eta = {pc.getMeson(221), // eta
-                              pc.getMeson(958), // eta prime
+                              pc.getMeson(331), // eta prime
                               pc.getMeson(441)  // eta c
   };
   plot_sep["eta"] = v_eta;
