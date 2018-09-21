@@ -4,6 +4,7 @@
 #define CONFIG_H
 
 #include "TMath.h"
+#include "TString.h"
 #include <gmp.h>
 #include <mpfr.h>
 
