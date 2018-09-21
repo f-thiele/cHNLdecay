@@ -44,4 +44,6 @@ And an example would be:
 This project uses the LLVM coding standards which can be found [here](http://llvm.org/docs/CodingStandards.html). Please make sure that your commits are adhering to them accordingly. For your convenience please consider installing a pre-commit hook as described [here](https://github.com/ddddavidmartin/Pre-commit-hooks). 
 
 ## License
-All rights reserved by **Fabian A.J. Thiele**, <fabian.thiele@cern.ch>
+This project is licensed under the terms of the GPL v3 or any later version (**GPL-3.0-or-later**).
+
+cHNLdecay Copyright (C) 2018 **Fabian A.J. Thiele**, <fabian.thiele@cern.ch>
