@@ -13,14 +13,12 @@ class Meson : public Particle {
 public:
   Meson() : Particle() {
     decayConstant = 0;
-    vals = {};
     charge = Charge::Unknown;
     type = MesonType::Unknown;
   }
   Meson(Int_t p, Double_t m, Double_t c, MesonType t, Charge q)
       : Particle(p, m) {
     decayConstant = c;
-    vals = {};
     charge = q;
     type = t;
   }
@@ -29,6 +27,17 @@ public:
     vals = obj.getValueMap();
     charge = obj.getCharge();
     type = obj.getMesonType();
+  }
+
+  Meson& operator=(const Meson &obj) {
+    Particle::operator=(obj);
+
+    decayConstant = obj.getDecayConstant();
+    vals = obj.getValueMap();
+    charge = obj.getCharge();
+    type = obj.getMesonType();
+
+    return *this;
   }
 
   MesonType getMesonType() const { return type; }

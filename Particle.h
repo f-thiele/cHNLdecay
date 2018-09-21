@@ -33,6 +33,14 @@ public:
     return pdgid == a.getPdgId(); // true if they have the same pdg IDs
   }
 
+  Particle& operator=(const Particle &obj) {
+    pdgid = obj.getPdgId();
+    name = obj.getName();
+    mass = obj.getMass();
+
+    return *this;
+  }
+
 protected:
   TString pdgIdToLaTeX(Int_t p) const {
     std::map<Int_t, TString> label = {

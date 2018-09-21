@@ -15,7 +15,7 @@ extern Level gLOGLEVEL;
 
 class Logger {
 public:
-  Logger(Level l) { _level = l; }; // Level l, LogSink& ls);
+  explicit Logger(Level l) { _level = l; }; // Level l, LogSink& ls);
 
   void operator()(std::string const &message, char const *function,
                   char const *file, int line) {
