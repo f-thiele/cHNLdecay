@@ -1,19 +1,19 @@
 // Copyright (C) 2018 - Fabian A.J. Thiele, <fabian.thiele@cern.ch>
 
-#ifndef   HNL_H
-#define   HNL_H
+#ifndef HNL_H
+#define HNL_H
 
-#include <map>
-#include <utility>
-#include <iostream>
-#include "TString.h"
 #include "Config.h"
 #include "Lepton.h"
 #include "Meson.h"
+#include "TString.h"
+#include <iostream>
+#include <map>
+#include <utility>
 
 class HNL {
- public:
-  HNL(TString n, Double_t m, Double_t U2, const Lepton& a) {
+public:
+  HNL(TString n, Double_t m, Double_t U2, const Lepton &a) {
     name = n;
     mass = m;
     angle = U2;
@@ -25,7 +25,7 @@ class HNL {
     name = n;
     mass = m;
     angle = U2;
-    for(auto l : a) {
+    for (auto l : a) {
       generation.emplace_back(Lepton(l));
     }
     dc_c;
@@ -33,21 +33,18 @@ class HNL {
     majorana = true;
   }
 
-  bool mixesWith(const Lepton& a) const {
+  bool mixesWith(const Lepton &a) const {
     bool mixes = false;
-    for(auto g : generation) {
-      if(g==a) mixes = true;
+    for (auto g : generation) {
+      if (g == a)
+        mixes = true;
     }
     return mixes;
   }
 
-  Double_t getMass() const {
-    return mass;
-  }
+  Double_t getMass() const { return mass; }
 
-  Double_t getAngle() const {
-    return angle;
-  }
+  Double_t getAngle() const { return angle; }
 
   void setMass(Double_t m) {
     clearDecayChannels();
@@ -59,9 +56,7 @@ class HNL {
     angle = a;
   }
 
-  TString getName() const {
-    return name;
-  }
+  TString getName() const { return name; }
 
   void newDecayChannel(std::vector<Int_t> particles, Double_t value) {
     dc_c.insert(std::pair<std::vector<Int_t>, Double_t>(particles, value));
@@ -71,32 +66,29 @@ class HNL {
     return (dc_c.count(p) > 0);
   }
 
-  void clearDecayChannels() {
-    dc_c.clear();
-  }
+  void clearDecayChannels() { dc_c.clear(); }
 
-  bool isMajorana() const {
-    return majorana;
-  }
+  bool isMajorana() const { return majorana; }
 
-  void setMajorana(bool val) {
-    majorana = val;
-  }
+  void setMajorana(bool val) { majorana = val; }
 
   std::map<std::vector<Int_t>, Double_t> getDecayChannels() const {
     return dc_c;
   }
 
-  std::vector<Lepton> getGeneration() const {
-    return generation;
-  }
+  std::vector<Lepton> getGeneration() const { return generation; }
 
-  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta, bool invisible=true);
-  Double_t getPartialWidthInv(std::shared_ptr<Config> cfg, const Lepton &alpha, const Lepton &beta);
-  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha, const Meson &m);
-  Double_t getTotalWidth(std::shared_ptr<Config> cfg, const std::vector<Lepton> &leptons, const std::vector<Meson> &mesons);
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                           const Lepton &beta, bool invisible = true);
+  Double_t getPartialWidthInv(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                              const Lepton &beta);
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                           const Meson &m);
+  Double_t getTotalWidth(std::shared_ptr<Config> cfg,
+                         const std::vector<Lepton> &leptons,
+                         const std::vector<Meson> &mesons);
 
- private:
+private:
   TString name;
   Double_t mass;
   Double_t angle;
