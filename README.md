@@ -43,6 +43,13 @@ And an example would be:
 ## Contributing
 This project uses the LLVM coding standards which can be found [here](http://llvm.org/docs/CodingStandards.html). Please make sure that your commits are adhering to them accordingly. For your convenience please consider installing a pre-commit hook as described [here](https://github.com/ddddavidmartin/Pre-commit-hooks). 
 
+## References
+This implementation tries to correctly implement equations from [arXiv:1805.08567v2 [hep-ph]](https://arxiv.org/abs/1805.08567v2) without guarantee of its accuracy or endorsement of its authors. Details of the published paper can also be found in `CITATION`.
+
+Paper list:
+
+  - K. Bondarenko, A. Boyarsky, D. Gorbunov and O. Ruchayskiy, *Phenomenology of GeV-scale Heavy Neutral Leptons*, [arXiv:1805.08567v2 [hep-ph]](https://arxiv.org/abs/1805.08567v2)
+
 ## License
 This project is licensed under the terms of the GPL v3 or any later version (**GPL-3.0-or-later**).
 
