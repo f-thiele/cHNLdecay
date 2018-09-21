@@ -40,5 +40,8 @@ And an example would be:
 ./cHNLdecay --generations 11,13,15 --mass 20000 --angle 3.5e-6
 ```
 
+## Contributing
+This project uses the LLVM coding standards which can be found [here](http://llvm.org/docs/CodingStandards.html). Please make sure that your commits are adhering to them accordingly. For your convenience please consider installing a pre-commit hook as described [here](https://github.com/ddddavidmartin/Pre-commit-hooks). 
+
 ## License
 All rights reserved by **Fabian A.J. Thiele**, <fabian.thiele@cern.ch>

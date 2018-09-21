@@ -8,3 +8,4 @@ cHNLdecay
 *.synctex.gz
 *.out
 auto
+pre-commit-clang-format
