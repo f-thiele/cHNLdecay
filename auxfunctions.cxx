@@ -100,18 +100,16 @@ Double_t gamma2ctau(std::shared_ptr<Config> cfg, Double_t gamma) {
   // gamma is expected in [MeV]
   // output ctau is in [mm]
 
-  mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
+  mpfr_t fermiC, fermiCsq, pi, SOL, HBAR;
   unsigned int BITS = cfg->getBITS();
   mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
   mpfr_init2(pi, BITS);
-  mpfr_init2(VUDsq, BITS);
   mpfr_init2(SOL, BITS);
   mpfr_init2(HBAR, BITS);
   cfg->getFermiCsq(fermiCsq);
   cfg->getFermiC(fermiC);
   cfg->getPi(pi);
-  cfg->getVUDsq(VUDsq);
   cfg->getSOL(SOL);
   cfg->getHBAR(HBAR);
   mpfr_t _gamma, result;
@@ -125,7 +123,7 @@ Double_t gamma2ctau(std::shared_ptr<Config> cfg, Double_t gamma) {
   mpfr_div(result, result, _gamma, MPFR_RNDD); // [mm]
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, _gamma, result,
+  mpfr_clears(fermiC, fermiCsq, pi, SOL, HBAR, _gamma, result,
               (mpfr_ptr)0);
 
   return rval;

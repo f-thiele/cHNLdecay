@@ -21,6 +21,7 @@
 
 #include "TMath.h"
 #include "TString.h"
+#include "Meson.h"
 #include <gmp.h>
 #include <mpfr.h>
 
@@ -38,7 +39,7 @@ public:
   }
 
   ~Config(void) {
-    mpfr_clears(fermiC, fermiCsq, pi, VUDsq, SOL, HBAR, (mpfr_ptr)0);
+    mpfr_clears(fermiC, fermiCsq, pi, SOL, HBAR, (mpfr_ptr)0);
   }
 
   TString getName() const { return name; }
@@ -47,14 +48,30 @@ public:
   void getFermiC(mpfr_t result) { mpfr_set(result, fermiC, MPFR_RNDD); }
   void getFermiCsq(mpfr_t result) { mpfr_set(result, fermiCsq, MPFR_RNDD); }
   void getPi(mpfr_t result) { mpfr_set(result, pi, MPFR_RNDD); }
-  void getVUDsq(mpfr_t result) { mpfr_set(result, VUDsq, MPFR_RNDD); }
+  void getVUDsq(mpfr_t result, const Meson &m) {
+    mpfr_set_d(result, ckm.at({m.getU(), m.getD()}), MPFR_RNDD);
+    mpfr_pow_ui(result, result, 2, MPFR_RNDD);
+  }
   void getSOL(mpfr_t result) { mpfr_set(result, SOL, MPFR_RNDD); }
   void getHBAR(mpfr_t result) { mpfr_set(result, HBAR, MPFR_RNDD); }
 
 private:
   TString name;
   unsigned int BITS;
-  mpfr_t fermiC, fermiCsq, pi, VUDsq, SOL, HBAR;
+  mpfr_t fermiC, fermiCsq, pi, SOL, HBAR;
+
+    std::map<std::pair<Quark, Quark>, Double_t> ckm = {
+                                                          {{Quark::up, Quark::down}, 0.97427},
+                                                          {{Quark::up, Quark::strange}, 0.22534},
+                                                          {{Quark::up, Quark::bottom}, 0.00351},
+                                                          {{Quark::charm, Quark::down}, 0.22520},
+                                                          {{Quark::charm, Quark::strange}, 0.97344},
+                                                          {{Quark::charm, Quark::bottom}, 0.0412},
+                                                          {{Quark::top, Quark::down}, 0.00867},
+                                                          {{Quark::top, Quark::strange}, 0.0404},
+                                                          {{Quark::top, Quark::bottom}, 0.999146}
+    };
+
 
   void initialize() {
     mpfr_init2(fermiC, BITS);
@@ -67,10 +84,6 @@ private:
 
     mpfr_init2(pi, BITS);
     mpfr_set_d(pi, TMath::Pi(), MPFR_RNDD);
-
-    mpfr_init2(VUDsq, BITS);
-    mpfr_set_d(VUDsq, 0.97425, MPFR_RNDD);
-    mpfr_pow_ui(VUDsq, VUDsq, 2, MPFR_RNDD);
 
     mpfr_init2(SOL, BITS);
     mpfr_set_d(SOL, 299792458, MPFR_RNDD);

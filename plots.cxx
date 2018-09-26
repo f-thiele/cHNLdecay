@@ -58,7 +58,7 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha,
       cfg->getFermiCsq(fermiCsq);
       cfg->getFermiC(fermiC);
       cfg->getPi(pi);
-      cfg->getVUDsq(VUDsq);
+      cfg->getVUDsq(VUDsq, m);
 
       mpfr_t temp, factor, mesonMass, HNLmass, angle, ghsq;
 
