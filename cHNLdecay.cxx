@@ -137,18 +137,17 @@ int main(int argc, char **argv) {
       HNLmass = std::atoi(optarg);
       break;
 
-    case 's':
-      {
-        TString ctauOrLoad = TString(optarg);
-        if(ctauOrLoad.IsFloat()) {
-          ctau = ctauOrLoad.Atof();
-        } else {
-          loadPath = ctauOrLoad;
-          isLoad = true;
-        }
+    case 's': {
+      TString ctauOrLoad = TString(optarg);
+      if (ctauOrLoad.IsFloat()) {
+        ctau = ctauOrLoad.Atof();
+      } else {
+        loadPath = ctauOrLoad;
+        isLoad = true;
       }
+    }
 
-      break;
+    break;
 
     case '?':
       /* getopt_long already printed an error message. */
@@ -241,22 +240,27 @@ int main(int argc, char **argv) {
                 "mesons_vector_charged.pdf", 500, 5000);
   N.setMajorana(isMajorana); // restore majorana value
 
-  if(ctau > 0) {
-    LOG_INFO("Searching now for U2 for 0.1 mm ctau... This might take a while!");
-    Double_t foundU2 = ctauToU2(cfg, ctau, all_leptons, mesons, N, 1e-2, 1e-6, 1-1e-5);
+  if (ctau > 0) {
+    LOG_INFO(
+        "Searching now for U2 for 0.1 mm ctau... This might take a while!");
+    Double_t foundU2 =
+        ctauToU2(cfg, ctau, all_leptons, mesons, N, 1e-2, 1e-6, 1 - 1e-5);
     LOG_INFO(std::endl << "FOUND U2: " << foundU2);
   }
 
-  if(isLoad) {
-    std::vector<std::vector<Double_t> > data = parseFile(loadPath.Data());
+  if (isLoad) {
+    std::vector<std::vector<Double_t>> data = parseFile(loadPath.Data());
     std::ofstream outU2("foundU2.txt");
-    for(auto line : data) {
-      N.setMass(line.at(0)*1000.);
+    for (auto line : data) {
+      N.setMass(line.at(0) * 1000.);
       Double_t c = line.at(1);
-      LOG_INFO("Searching now for " << N.getMass() << " and " << c << " mm ctau... This might take a while!");
-      Double_t foundU2 = ctauToU2(cfg, c, all_leptons, mesons, N, 1e-2, 1e-6, 1-1e-5);
+      LOG_INFO("Searching now for " << N.getMass() << " and " << c
+                                    << " mm ctau... This might take a while!");
+      Double_t foundU2 =
+          ctauToU2(cfg, c, all_leptons, mesons, N, 1e-2, 1e-6, 1 - 1e-5);
       LOG_INFO(std::endl << "FOUND U2: " << foundU2);
-      outU2 << line.at(0) << " " << " " << c << " " << foundU2 << std::endl;
+      outU2 << line.at(0) << " "
+            << " " << c << " " << foundU2 << std::endl;
     }
     outU2.close();
   }

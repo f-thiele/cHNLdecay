@@ -44,6 +44,6 @@ Double_t ctauToU2(std::shared_ptr<Config> cfg, Double_t target,
 TString pdgIdToLaTeX(Int_t p);
 TGraph *create_graph(Double_t xd, Double_t xl, Float_t low = 0,
                      Float_t high = 0.5, Float_t stepsize = 0.001);
-std::vector<std::vector<Double_t> > parseFile(std::string name);
+std::vector<std::vector<Double_t>> parseFile(std::string name);
 void plot_I();
 #endif

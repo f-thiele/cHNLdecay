@@ -30,8 +30,8 @@
 #include "TGraph.h"
 #include "TLegend.h"
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 void kaellen(std::shared_ptr<Config> cfg, mpfr_t result, mpfr_t a, mpfr_t b,
              mpfr_t c) {
@@ -123,8 +123,7 @@ Double_t gamma2ctau(std::shared_ptr<Config> cfg, Double_t gamma) {
   mpfr_div(result, result, _gamma, MPFR_RNDD); // [mm]
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, SOL, HBAR, _gamma, result,
-              (mpfr_ptr)0);
+  mpfr_clears(fermiC, fermiCsq, pi, SOL, HBAR, _gamma, result, (mpfr_ptr)0);
 
   return rval;
 }
@@ -248,25 +247,23 @@ TString pdgIdToLaTeX(Int_t p) {
   return TString("");
 }
 
-std::vector<std::vector<Double_t> > parseFile(std::string name) {
-  std::vector<std::vector<Double_t> >     data;
+std::vector<std::vector<Double_t>> parseFile(std::string name) {
+  std::vector<std::vector<Double_t>> data;
 
   std::ifstream file(name);
 
   std::string line;
 
-  while(std::getline(file, line))
-    {
-      std::vector<Double_t>   lineData;
-      std::stringstream  lineStream(line);
+  while (std::getline(file, line)) {
+    std::vector<Double_t> lineData;
+    std::stringstream lineStream(line);
 
-      Double_t value;
-      while(lineStream >> value)
-        {
-          lineData.push_back(value);
-        }
-      data.push_back(lineData);
+    Double_t value;
+    while (lineStream >> value) {
+      lineData.push_back(value);
     }
+    data.push_back(lineData);
+  }
 
   return data;
 }

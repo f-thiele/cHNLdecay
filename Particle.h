@@ -49,7 +49,7 @@ public:
     return pdgid == a.getPdgId(); // true if they have the same pdg IDs
   }
 
-  Particle& operator=(const Particle &obj) {
+  Particle &operator=(const Particle &obj) {
     pdgid = obj.getPdgId();
     name = obj.getName();
     mass = obj.getMass();

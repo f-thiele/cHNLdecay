@@ -36,23 +36,23 @@ public:
     Lepton tau = Lepton(15, tauMass);
     addTo(tau);
 
-    Meson pi =
-      Meson(211, 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged, Quark::up, Quark::down);
+    Meson pi = Meson(211, 139.57018, 130.2, MesonType::pseudoscalar,
+                     Charge::charged, Quark::up, Quark::down);
     addTo(pi);
-    Meson K =
-      Meson(321, 493.677, 155.6, MesonType::pseudoscalar, Charge::charged, Quark::up, Quark::strange);
+    Meson K = Meson(321, 493.677, 155.6, MesonType::pseudoscalar,
+                    Charge::charged, Quark::up, Quark::strange);
     addTo(K);
-    Meson D =
-      Meson(411, 1869.62, 212, MesonType::pseudoscalar, Charge::charged, Quark::charm, Quark::down);
+    Meson D = Meson(411, 1869.62, 212, MesonType::pseudoscalar, Charge::charged,
+                    Quark::charm, Quark::down);
     addTo(D);
-    Meson Ds =
-      Meson(431, 1968.47, 249, MesonType::pseudoscalar, Charge::charged, Quark::charm, Quark::strange);
+    Meson Ds = Meson(431, 1968.47, 249, MesonType::pseudoscalar,
+                     Charge::charged, Quark::charm, Quark::strange);
     addTo(Ds);
-    Meson B =
-      Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged, Quark::up, Quark::bottom);
+    Meson B = Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged,
+                    Quark::up, Quark::bottom);
     addTo(B);
-    Meson Bc =
-      Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged, Quark::charm, Quark::bottom);
+    Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
+                     Quark::charm, Quark::bottom);
     addTo(Bc);
 
     Meson pi0 =
@@ -68,13 +68,14 @@ public:
         Meson(441, 2983.6, 237, MesonType::pseudoscalar, Charge::neutral);
     addTo(etac);
 
-    Meson rho = Meson(213, 775.11, 162000, MesonType::vector, Charge::charged, Quark::up, Quark::down);
+    Meson rho = Meson(213, 775.11, 162000, MesonType::vector, Charge::charged,
+                      Quark::up, Quark::down);
     addTo(rho);
-    Meson Dstar =
-      Meson(413, 2010.26, 535000, MesonType::vector, Charge::charged, Quark::charm, Quark::down);
+    Meson Dstar = Meson(413, 2010.26, 535000, MesonType::vector,
+                        Charge::charged, Quark::charm, Quark::down);
     addTo(Dstar);
-    Meson Dstars =
-      Meson(431, 2112.1, 650000, MesonType::vector, Charge::charged, Quark::charm, Quark::strange);
+    Meson Dstars = Meson(431, 2112.1, 650000, MesonType::vector,
+                         Charge::charged, Quark::charm, Quark::strange);
     addTo(Dstars);
 
     Double_t weinberg = 0.2223;

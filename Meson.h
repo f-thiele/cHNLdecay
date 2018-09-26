@@ -24,7 +24,7 @@
 
 enum class MesonType { Unknown, pseudoscalar, vector };
 enum class Charge { Unknown, charged, neutral };
-enum class Quark { Unknown, up, down, charm, strange, top, bottom};
+enum class Quark { Unknown, up, down, charm, strange, top, bottom };
 
 class Meson : public Particle {
 public:
@@ -35,7 +35,8 @@ public:
     U = Quark::Unknown;
     D = Quark::Unknown;
   }
-  Meson(Int_t p, Double_t m, Double_t c, MesonType t, Charge q, Quark u = Quark::Unknown, Quark d = Quark::Unknown)
+  Meson(Int_t p, Double_t m, Double_t c, MesonType t, Charge q,
+        Quark u = Quark::Unknown, Quark d = Quark::Unknown)
       : Particle(p, m) {
     decayConstant = c;
     charge = q;
@@ -52,7 +53,7 @@ public:
     D = obj.getD();
   }
 
-  Meson& operator=(const Meson &obj) {
+  Meson &operator=(const Meson &obj) {
     Particle::operator=(obj);
 
     decayConstant = obj.getDecayConstant();
