@@ -29,6 +29,9 @@
 #include "TF1.h"
 #include "TGraph.h"
 #include "TLegend.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 void kaellen(std::shared_ptr<Config> cfg, mpfr_t result, mpfr_t a, mpfr_t b,
              mpfr_t c) {
@@ -245,6 +248,29 @@ TString pdgIdToLaTeX(Int_t p) {
     return ret;
   }
   return TString("");
+}
+
+std::vector<std::vector<Double_t> > parseFile(std::string name) {
+  std::vector<std::vector<Double_t> >     data;
+
+  std::ifstream file(name);
+
+  std::string line;
+
+  while(std::getline(file, line))
+    {
+      std::vector<Double_t>   lineData;
+      std::stringstream  lineStream(line);
+
+      Double_t value;
+      while(lineStream >> value)
+        {
+          lineData.push_back(value);
+        }
+      data.push_back(lineData);
+    }
+
+  return data;
 }
 
 void plot_I() {

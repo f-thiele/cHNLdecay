@@ -51,6 +51,11 @@ int main(int argc, char **argv) {
   Double_t angle = 0;
   std::vector<Lepton> mixes_with;
 
+  // variables used for searching for angle / parsing file for angles
+  bool isLoad = false;
+  TString loadPath;
+  Double_t ctau = 0;
+
   // sensible default for loglevel
   gLOGLEVEL = Level::INFO;
 
@@ -67,6 +72,7 @@ int main(int argc, char **argv) {
         {"generations", required_argument, 0, 'g'},
         {"angle", required_argument, 0, 'u'},
         {"mass", required_argument, 0, 'm'},
+        {"search-ctau", required_argument, 0, 's'},
         {0, 0, 0, 0}};
 
     /* getopt_long stores the option index here. */
@@ -129,6 +135,19 @@ int main(int argc, char **argv) {
 
     case 'm':
       HNLmass = std::atoi(optarg);
+      break;
+
+    case 's':
+      {
+        TString ctauOrLoad = TString(optarg);
+        if(ctauOrLoad.IsFloat()) {
+          ctau = ctauOrLoad.Atof();
+        } else {
+          loadPath = ctauOrLoad;
+          isLoad = true;
+        }
+      }
+
       break;
 
     case '?':
@@ -222,13 +241,30 @@ int main(int argc, char **argv) {
                 "mesons_vector_charged.pdf", 500, 5000);
   N.setMajorana(isMajorana); // restore majorana value
 
+  if(ctau > 0) {
+    LOG_INFO("Searching now for U2 for 0.1 mm ctau... This might take a while!");
+    Double_t foundU2 = ctauToU2(cfg, ctau, all_leptons, mesons, N, 1e-2, 1e-6, 1-1e-5);
+    LOG_INFO(std::endl << "FOUND U2: " << foundU2);
+  }
+
+  if(isLoad) {
+    std::vector<std::vector<Double_t> > data = parseFile(loadPath.Data());
+    std::ofstream outU2("foundU2.txt");
+    for(auto line : data) {
+      N.setMass(line.at(0)*1000.);
+      Double_t c = line.at(1);
+      LOG_INFO("Searching now for " << N.getMass() << " and " << c << " mm ctau... This might take a while!");
+      Double_t foundU2 = ctauToU2(cfg, c, all_leptons, mesons, N, 1e-2, 1e-6, 1-1e-5);
+      LOG_INFO(std::endl << "FOUND U2: " << foundU2);
+      outU2 << line.at(0) << " " << " " << c << " " << foundU2 << std::endl;
+    }
+    outU2.close();
+  }
+
   // EXAMPLE for further checks and configurations
   // ----------
   // N.setMass(3000);
   // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));
-  // LOG_INFO("Searching now for U2 for 0.1 mm ctau... This might take a
-  // while!"); Double_t foundU2 = ctauToU2(cfg, 0.1, all_leptons, mesons, N);
-  // LOG_INFO(std::endl << "FOUND U2: " << foundU2);
 
   return EXIT_SUCCESS;
 }
