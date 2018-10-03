@@ -157,6 +157,13 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons,
     }
     LOG_DEBUG("mass: " << N.getMass() << ", meson pw: " << tw_mes);
     res_m.emplace_back(mass);
+    TF1 *f = new TF1("#Delta_{QCD}", qcd_coupling, 1, 100, 0);
+    Double_t qcd_corr = qcd_correction(f->Eval(N.getMass() / 1000.));
+    LOG_DEBUG("QCD correction: " << qcd_corr);
+    delete f;
+
+    tw_mes = (1+qcd_corr)*tw_mes;
+
     Double_t tot = tw_mes + tw_lep + tw_inv;
     res_mes.emplace_back(tw_mes / tot);
     res_lep.emplace_back(tw_lep / tot);
