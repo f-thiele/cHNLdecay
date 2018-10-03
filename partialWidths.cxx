@@ -36,20 +36,18 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
     return 0; // this means we don't have enough mass in the HNL to produce
               // decay product on-shell
 
-  mpfr_t fermiC, fermiCsq, pi;
+  mpfr_t fermiCsq, pi;
   unsigned int BITS = cfg->getBITS();
-  mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
   mpfr_init2(pi, BITS);
 
   cfg->getFermiCsq(fermiCsq);
-  cfg->getFermiC(fermiC);
   cfg->getPi(pi);
 
-  mpfr_t denominator, temp, x, factor, betamass, HNLmass, NZ, angle;
+  mpfr_t denominator, temp, xsq, factor, betamass, HNLmass, NZ, angle;
 
   mpfr_init2(temp, BITS);
-  mpfr_init2(x, BITS);
+  mpfr_init2(xsq, BITS);
   mpfr_init2(factor, BITS);
   mpfr_init2(betamass, BITS);
   mpfr_init2(HNLmass, BITS);
@@ -61,23 +59,23 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
   mpfr_set_d(betamass, beta.getMass(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
-  mpfr_div(x, betamass, HNLmass, MPFR_RNDD);
+  mpfr_div(xsq, betamass, HNLmass, MPFR_RNDD);
+  mpfr_pow_ui(xsq, xsq, 2, MPFR_RNDD);
 
   // calculate first factors NZ * GF^2 * M^5 * U^2/(192*pi^3)
-  mpfr_mul(factor, NZ, fermiCsq, MPFR_RNDD);
-  mpfr_pow_ui(temp, HNLmass, 5, MPFR_RNDD);
-  mpfr_mul(factor, factor, temp, MPFR_RNDD);
+  mpfr_pow_ui(factor, HNLmass, 5, MPFR_RNDD);
+  mpfr_mul(factor, factor, fermiCsq, MPFR_RNDD);
+  mpfr_mul(factor, factor, NZ, MPFR_RNDD);
+  mpfr_mul(factor, factor, angle, MPFR_RNDD);
   mpfr_pow_ui(denominator, pi, 3, MPFR_RNDD);
   mpfr_mul_ui(denominator, denominator, 192, MPFR_RNDD);
   mpfr_div(factor, factor, denominator, MPFR_RNDD);
-  mpfr_mul(factor, factor, angle, MPFR_RNDD);
   // end calculation first factors
 
   // pre-calculate square root of 1-4*x^2
   mpfr_t sq1m4x2;
   mpfr_init2(sq1m4x2, BITS);
-  mpfr_pow_ui(sq1m4x2, x, 2, MPFR_RNDD);
-  mpfr_mul_ui(sq1m4x2, sq1m4x2, 4, MPFR_RNDD);
+  mpfr_mul_ui(sq1m4x2, xsq, 4, MPFR_RNDD);
   mpfr_ui_sub(sq1m4x2, 1, sq1m4x2, MPFR_RNDD);
   mpfr_sqrt(sq1m4x2, sq1m4x2, MPFR_RNDD);
   // end pre-calculation
@@ -85,16 +83,13 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
   // calculate L(x) (logarithm function)
   mpfr_t L;
   mpfr_init2(L, BITS);
-  mpfr_pow_ui(L, x, 2, MPFR_RNDD);
-  mpfr_mul_ui(L, L, 3, MPFR_RNDD);
+  mpfr_mul_ui(L, xsq, 3, MPFR_RNDD);
   mpfr_ui_sub(L, 1, L, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 2, MPFR_RNDD);
-  mpfr_ui_sub(temp, 1, temp, MPFR_RNDD);
+  mpfr_ui_sub(temp, 1, xsq, MPFR_RNDD);
   mpfr_mul(temp, temp, sq1m4x2, MPFR_RNDD);
   mpfr_sub(L, L, temp, MPFR_RNDD);
-  mpfr_pow_ui(denominator, x, 2, MPFR_RNDD);
   mpfr_add_ui(temp, sq1m4x2, 1, MPFR_RNDD);
-  mpfr_mul(denominator, denominator, temp, MPFR_RNDD);
+  mpfr_mul(denominator, xsq, temp, MPFR_RNDD);
   mpfr_div(L, L, denominator, MPFR_RNDD);
   mpfr_log(L, L, MPFR_RNDD);
   // end calculation L(x)
@@ -138,42 +133,38 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
   mpfr_t temp2;
   mpfr_init2(temp2, BITS);
 
-  mpfr_pow_ui(c1_factor, x, 2, MPFR_RNDD);
-  mpfr_mul_ui(c1_factor, c1_factor, 14, MPFR_RNDD);
+  mpfr_mul_ui(c1_factor, xsq, 14, MPFR_RNDD);
   mpfr_ui_sub(c1_factor, 1, c1_factor, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 4, MPFR_RNDD);
+  mpfr_pow_ui(temp, xsq, 2, MPFR_RNDD);
   mpfr_mul_ui(temp, temp, 2, MPFR_RNDD);
   mpfr_sub(c1_factor, c1_factor, temp, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 6, MPFR_RNDD);
+  mpfr_pow_ui(temp, xsq, 3, MPFR_RNDD);
   mpfr_mul_ui(temp, temp, 12, MPFR_RNDD);
   mpfr_sub(c1_factor, c1_factor, temp, MPFR_RNDD);
   mpfr_mul(c1_factor, c1_factor, sq1m4x2, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 4, MPFR_RNDD);
+  mpfr_pow_ui(temp, xsq, 2, MPFR_RNDD);
   mpfr_mul_ui(temp, temp, 12, MPFR_RNDD);
 
-  mpfr_pow_ui(temp2, x, 4, MPFR_RNDD);
+  mpfr_pow_ui(temp2, xsq, 2, MPFR_RNDD);
   mpfr_sub_ui(temp2, temp2, 1, MPFR_RNDD);
   mpfr_mul(temp, temp, temp2, MPFR_RNDD);
   mpfr_mul(temp, temp, L, MPFR_RNDD);
   mpfr_add(c1_factor, c1_factor, temp, MPFR_RNDD);
 
-  mpfr_pow_ui(c2_factor, x, 4, MPFR_RNDD);
+  mpfr_pow_ui(c2_factor, xsq, 2, MPFR_RNDD);
   mpfr_mul_ui(c2_factor, c2_factor, 12, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 2, MPFR_RNDD);
-  mpfr_mul_ui(temp, temp, 10, MPFR_RNDD);
+  mpfr_mul_ui(temp, xsq, 10, MPFR_RNDD);
   mpfr_sub(c2_factor, temp, c2_factor, MPFR_RNDD);
   mpfr_add_ui(c2_factor, c2_factor, 2, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 2, MPFR_RNDD);
-  mpfr_mul(c2_factor, temp, c2_factor, MPFR_RNDD);
+  mpfr_mul(c2_factor, xsq, c2_factor, MPFR_RNDD);
   mpfr_mul(c2_factor, c2_factor, sq1m4x2, MPFR_RNDD);
-  mpfr_pow_ui(temp2, x, 4, MPFR_RNDD);
+  mpfr_pow_ui(temp2, xsq, 2, MPFR_RNDD);
   mpfr_mul_ui(temp2, temp2, 2, MPFR_RNDD);
-  mpfr_pow_ui(temp, x, 2, MPFR_RNDD);
-  mpfr_mul_ui(temp, temp, 2, MPFR_RNDD);
+  mpfr_mul_ui(temp, xsq, 2, MPFR_RNDD);
   mpfr_ui_sub(temp, 1, temp, MPFR_RNDD);
   mpfr_add(temp, temp, temp2, MPFR_RNDD);
   mpfr_mul(temp, temp, L, MPFR_RNDD);
-  mpfr_pow_ui(temp2, x, 4, MPFR_RNDD);
+  mpfr_pow_ui(temp2, xsq, 2, MPFR_RNDD);
   mpfr_mul_ui(temp2, temp2, 6, MPFR_RNDD);
   mpfr_mul(temp, temp, temp2, MPFR_RNDD);
   mpfr_add(c2_factor, c2_factor, temp, MPFR_RNDD);
@@ -188,7 +179,7 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
 
-  mpfr_clears(fermiC, fermiCsq, pi, result, denominator, temp, x, factor,
+  mpfr_clears(fermiCsq, pi, result, denominator, temp, xsq, factor,
               betamass, HNLmass, NZ, angle, sq1m4x2, L, weinberg, c1, c2,
               c1_factor, c2_factor, temp2, (mpfr_ptr)0);
   return rval;
@@ -262,13 +253,11 @@ Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg,
    * We just need to load configuration for precision bits and
    * nature constants
    */
-  mpfr_t fermiC, fermiCsq, pi;
+  mpfr_t fermiCsq, pi;
   unsigned int BITS = cfg->getBITS();
-  mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
   mpfr_init2(pi, BITS);
   cfg->getFermiCsq(fermiCsq);
-  cfg->getFermiC(fermiC);
   cfg->getPi(pi);
   // end of loading configuration
 
@@ -279,11 +268,10 @@ Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg,
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
 
-  unsigned int equal = 0;
+  unsigned int equal = 1;
   if (alpha == beta) {
-    equal += 1;
+    equal++; // increase by one to get the right factor (1+delta_{alpha,beta})
   }
-  equal += 1; // increase by one to get the right factor (1+delta_{alpha,beta})
 
   mpfr_t result, temp;
   mpfr_init2(result, BITS);
@@ -299,7 +287,7 @@ Double_t pw_nualpha_nubeta_nubeta(std::shared_ptr<Config> cfg,
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
 
-  mpfr_clears(fermiC, fermiCsq, pi, HNLmass, angle, result, temp, (mpfr_ptr)0);
+  mpfr_clears(fermiCsq, pi, HNLmass, angle, result, temp, (mpfr_ptr)0);
   return rval;
 }
 
