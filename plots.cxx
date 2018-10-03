@@ -171,6 +171,7 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons,
   }
 
   TCanvas *c1 = new TCanvas("c1", "c1", 500, 400);
+  c1->SetGrid();
 
   TGraph *g_mes = new TGraph(res_m.size(), &(res_m[0]), &(res_mes[0]));
   TGraph *g_lep = new TGraph(res_m.size(), &(res_m[0]), &(res_lep[0]));
@@ -306,6 +307,7 @@ void plot_br_low(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons,
   }
 
   TCanvas *c1 = new TCanvas("c1", "c1", 500, 400);
+  c1->SetGrid();
 
   Short_t lc = 1;
 
