@@ -53,13 +53,21 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
                                            beta.getPdgId() + 1},
                         la_lb_nub);
 
-  Double_t pw = nununu + nua_lb_lb + charge_factor * la_lb_nub;
+  Double_t pw = nununu + nua_lb_lb + la_lb_nub;
+  pw *= charge_factor;
 
   return pw;
 }
 
 Double_t HNL::getPartialWidthInv(std::shared_ptr<Config> cfg,
                                  const Lepton &alpha, const Lepton &beta) {
+  // if charge conjugated channels exist and we have a majorana HNL we need to
+  // multiply the partial widths for them by 2
+  Double_t charge_factor = 1;
+  if (this->isMajorana()) {
+    charge_factor = 2;
+  }
+
   Double_t nununu =
       std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
 
@@ -68,7 +76,7 @@ Double_t HNL::getPartialWidthInv(std::shared_ptr<Config> cfg,
                                            -(beta.getPdgId() + 1)},
                         nununu);
 
-  return nununu;
+  return charge_factor*nununu;
 }
 
 Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
@@ -86,7 +94,7 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
     this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(), m.getPdgId()},
                           temp);
 
-    dw += charge_factor * temp;
+    dw += temp;
 
   } else if (m.getMesonType() == MesonType::pseudoscalar and
              m.getCharge() == Charge::neutral) {
@@ -102,7 +110,7 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
     this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(), m.getPdgId()},
                           temp);
 
-    dw += charge_factor * temp;
+    dw += temp;
 
   } else if (m.getMesonType() == MesonType::vector and
              m.getCharge() == Charge::neutral) {
@@ -116,7 +124,7 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
     throw std::runtime_error("Cannot use meson with undefined MesonType");
   }
 
-  return dw;
+  return charge_factor*dw;
 }
 
 Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
@@ -146,7 +154,6 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
   delete f;
 
   Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept;
-  totalWidth *= 1.; // multiply by two for majorana channels
 
   return totalWidth;
 }
