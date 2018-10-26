@@ -95,6 +95,10 @@ public:
   std::vector<Lepton> getGeneration() const { return generation; }
 
   Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                                const Quark &beta);
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                           const Quark &beta, const Quark &gamma);
+  Double_t getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
                            const Lepton &beta, bool invisible = true);
   Double_t getPartialWidthInv(std::shared_ptr<Config> cfg, const Lepton &alpha,
                               const Lepton &beta);
@@ -102,7 +106,10 @@ public:
                            const Meson &m);
   Double_t getTotalWidth(std::shared_ptr<Config> cfg,
                          const std::vector<Lepton> &leptons,
-                         const std::vector<Meson> &mesons);
+                         const std::vector<Meson> &particles);
+  Double_t getTotalWidth(std::shared_ptr<Config> cfg,
+                         const std::vector<Lepton> &leptons,
+                         const std::vector<Quark> &particles);
 
 private:
   TString name;

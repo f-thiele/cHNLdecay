@@ -60,6 +60,7 @@ public:
 protected:
   TString pdgIdToLaTeX(Int_t p) const {
     std::map<Int_t, TString> label = {
+        {1, "d"}, {2, "u"}, {3, "s"}, {4, "c"}, {5, "b"}, {6, "t"},
         {11, "e^-"},           {12, "\\nu_e"},   {13, "\\mu^-"},
         {14, "\\nu_\\mu"},     {15, "\\tau^-"},  {16, "\\nu_\\tau"},
         {211, "\\pi^+"},       {321, "K^+"},     {411, "D^+"},

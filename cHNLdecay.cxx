@@ -27,6 +27,7 @@
 #include "HNL.h"
 #include "Lepton.h"
 #include "Meson.h"
+#include "Quark.h"
 
 #include "Config.h"
 #include "Logger.h"
@@ -46,10 +47,11 @@ Level gLOGLEVEL;
 int main(int argc, char **argv) {
   auto cfg = std::make_shared<Config>(); // set BITS and initialize constants
 
-  // initialize the three variables that define our HNL
+  // initialize the variables that define our HNL
   Int_t HNLmass = 0;
   Double_t angle = 0;
   std::vector<Lepton> mixes_with;
+  bool majorana = true;
 
   // variables used for searching for angle / parsing file for angles
   bool isLoad = false;
@@ -72,6 +74,7 @@ int main(int argc, char **argv) {
         {"generations", required_argument, 0, 'g'},
         {"angle", required_argument, 0, 'u'},
         {"mass", required_argument, 0, 'm'},
+        {"majorana", required_argument, 0, 'c'},
         {"search-ctau", required_argument, 0, 's'},
         {0, 0, 0, 0}};
 
@@ -145,9 +148,16 @@ int main(int argc, char **argv) {
         loadPath = ctauOrLoad;
         isLoad = true;
       }
+      break;
     }
 
-    break;
+
+    case 'c':
+      if(std::atoi(optarg)==1)
+        majorana = true;
+      else
+        majorana = false;
+      break;
 
     case '?':
       /* getopt_long already printed an error message. */
@@ -172,10 +182,44 @@ int main(int argc, char **argv) {
   // this is the HNL we configure via command line options. If it mixes with
   // multiple generations it can only assume mixing angle ratios 1:1:..:1
   HNL N = HNL("HNL", HNLmass, angle, mixes_with);
+  N.setMajorana(majorana);
 
   Double_t Gamma = N.getTotalWidth(cfg, all_leptons, mesons);
   LOG_INFO("mass=" << N.getMass() / 1000. << " GeV, "
                    << "ctau=" << gamma2ctau(cfg, Gamma) << " mm");
+
+
+  Quark down = Quark(1, 4.8, Quark_Type::down);
+  Quark up = Quark(2, 2.3, Quark_Type::up);
+  Quark strange = Quark(3, 96, Quark_Type::charm);
+  Quark charm = Quark(4, 1280, Quark_Type::charm);
+  Quark bottom = Quark(5, 4180, Quark_Type::bottom);
+  Quark top = Quark(6, 173100, Quark_Type::top);
+
+  std::vector<Quark> quarks = {up, down, strange, charm, bottom, top};
+  Gamma = N.getTotalWidth(cfg, all_leptons, quarks);
+  LOG_INFO("mass=" << N.getMass() / 1000. << " GeV, "
+           << "ctau=" << gamma2ctau(cfg, Gamma) << " mm");
+  std::cout << "total width: " << Gamma << std::endl;
+
+  std::cout << "majorana flag" << majorana << std::endl;
+  N.setMajorana(not majorana);
+  Gamma = N.getTotalWidth(cfg, all_leptons, quarks);
+  LOG_INFO("mass=" << N.getMass() / 1000. << " GeV, "
+           << "ctau=" << gamma2ctau(cfg, Gamma) << " mm");
+  std::cout << "total width: " << Gamma << std::endl;
+  N.setMajorana(majorana);
+
+  // for(auto l : all_leptons) {
+  //   std::cout << l.getName() << std::endl;
+  //   for(auto q : quarks) {
+  //     std::cout << q.getName() << std::endl;
+  //     for(auto p : quarks) {
+  //       std::cout << p.getName() << std::endl;
+  //       std::cout << "pw:" << N.getPartialWidth(cfg, l, q, p) << std::endl;
+  //     }
+  //   }
+  // }
 
   auto ch = N.getDecayChannels();
   Int_t longest_channel = 0;
@@ -228,23 +272,22 @@ int main(int argc, char **argv) {
   delete f;
 
   plot_I();
-  plot_br(cfg, all_leptons, mesons, N, "BR.pdf", 1000, 5000);
+  plot_br(cfg, all_leptons, quarks, N, "BR.pdf", 1000, 5000);
 
   plot_qcd_correction("qcd_corr.pdf");
   plot_qcd_coupling("qcd_coupl.pdf");
 
-  bool isMajorana = N.isMajorana();
   N.setMajorana(false); // disable majorana here because we want to compare the
                         // pw for one charge configuration only
   plot_meson_pw(cfg, pc.getLepton(13), vector_charged, N,
                 "mesons_vector_charged.pdf", 500, 5000);
-  N.setMajorana(isMajorana); // restore majorana value
+  N.setMajorana(majorana); // restore majorana value
 
   if (ctau > 0) {
     LOG_INFO(
         "Searching now for U2 for 0.1 mm ctau... This might take a while!");
     Double_t foundU2 =
-        ctauToU2(cfg, ctau, all_leptons, mesons, N, 1e-2, 1e-6, 1 - 1e-5);
+        ctauToU2(cfg, ctau, all_leptons, quarks, N, 1e-4);
     LOG_INFO(std::endl << "FOUND U2: " << foundU2);
   }
 
@@ -257,7 +300,7 @@ int main(int argc, char **argv) {
       LOG_INFO("Searching now for " << N.getMass() << " and " << c
                                     << " mm ctau... This might take a while!");
       Double_t foundU2 =
-          ctauToU2(cfg, c, all_leptons, mesons, N, 1e-2, 1e-6, 1 - 1e-5);
+          ctauToU2(cfg, c, all_leptons, quarks, N, 1e-2);
       LOG_INFO(std::endl << "FOUND U2: " << foundU2);
       outU2 << line.at(0) << " "
             << " " << c << " " << foundU2 << std::endl;

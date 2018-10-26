@@ -20,6 +20,7 @@
 #define CONFIG_H
 
 #include "Meson.h"
+#include "Quark.h"
 #include "TMath.h"
 #include "TString.h"
 #include <gmp.h>
@@ -42,32 +43,33 @@ public:
 
   TString getName() const { return name; }
 
-  unsigned int getBITS() { return BITS; }
-  void getFermiC(mpfr_t result) { mpfr_set(result, fermiC, MPFR_RNDD); }
-  void getFermiCsq(mpfr_t result) { mpfr_set(result, fermiCsq, MPFR_RNDD); }
-  void getPi(mpfr_t result) { mpfr_set(result, pi, MPFR_RNDD); }
-  void getVUDsq(mpfr_t result, const Meson &m) {
+  unsigned int getBITS() const { return BITS; }
+  void getFermiC(mpfr_t result) const { mpfr_set(result, fermiC, MPFR_RNDD); }
+  void getFermiCsq(mpfr_t result) const { mpfr_set(result, fermiCsq, MPFR_RNDD); }
+  void getPi(mpfr_t result) const { mpfr_set(result, pi, MPFR_RNDD); }
+  void getVUDsq(mpfr_t result, const Meson &m) const {
     mpfr_set_d(result, ckm.at({m.getU(), m.getD()}), MPFR_RNDD);
     mpfr_pow_ui(result, result, 2, MPFR_RNDD);
   }
-  void getSOL(mpfr_t result) { mpfr_set(result, SOL, MPFR_RNDD); }
-  void getHBAR(mpfr_t result) { mpfr_set(result, HBAR, MPFR_RNDD); }
+  Double_t getVUDsq(const Quark &u, const Quark &d) const { return ckm.at({u.getQuarkType(), d.getQuarkType()});}
+  void getSOL(mpfr_t result) const { mpfr_set(result, SOL, MPFR_RNDD); }
+  void getHBAR(mpfr_t result) const { mpfr_set(result, HBAR, MPFR_RNDD); }
 
 private:
   TString name;
   unsigned int BITS;
   mpfr_t fermiC, fermiCsq, pi, SOL, HBAR;
 
-  std::map<std::pair<Quark, Quark>, Double_t> ckm = {
-      {{Quark::up, Quark::down}, 0.97427},
-      {{Quark::up, Quark::strange}, 0.22534},
-      {{Quark::up, Quark::bottom}, 0.00351},
-      {{Quark::charm, Quark::down}, 0.22520},
-      {{Quark::charm, Quark::strange}, 0.97344},
-      {{Quark::charm, Quark::bottom}, 0.0412},
-      {{Quark::top, Quark::down}, 0.00867},
-      {{Quark::top, Quark::strange}, 0.0404},
-      {{Quark::top, Quark::bottom}, 0.999146}};
+  std::map<std::pair<Quark_Type, Quark_Type>, Double_t> ckm = {
+      {{Quark_Type::up, Quark_Type::down}, 0.97427},
+      {{Quark_Type::up, Quark_Type::strange}, 0.22534},
+      {{Quark_Type::up, Quark_Type::bottom}, 0.00351},
+      {{Quark_Type::charm, Quark_Type::down}, 0.22520},
+      {{Quark_Type::charm, Quark_Type::strange}, 0.97344},
+      {{Quark_Type::charm, Quark_Type::bottom}, 0.0412},
+      {{Quark_Type::top, Quark_Type::down}, 0.00867},
+      {{Quark_Type::top, Quark_Type::strange}, 0.0404},
+      {{Quark_Type::top, Quark_Type::bottom}, 0.999146}};
 
   void initialize() {
     mpfr_init2(fermiC, BITS);

@@ -26,10 +26,22 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
 Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
                                 const Lepton &alpha, const Lepton &beta,
                                 const HNL &N) {
+  return pw_nualpha_lbeta_lbeta(cfg, alpha, beta, N, 1);
+}
+
+Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
+                                const Lepton &alpha, const Quark &beta,
+                                const HNL &N) {
+  return pw_nualpha_lbeta_lbeta(cfg, alpha, beta, N, 3);
+}
+
+
+Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
+                                const Lepton &alpha, const Particle &beta,
+                                const HNL &N, Double_t d_NZ) {
   if (not N.mixesWith(alpha))
     return 0;
   if (N.getMass() < 2. * beta.getMass())
@@ -55,7 +67,7 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
   mpfr_init2(angle, BITS);
   mpfr_init2(denominator, BITS);
 
-  mpfr_set_d(NZ, 1, MPFR_RNDD);
+  mpfr_set_d(NZ, d_NZ, MPFR_RNDD);
   mpfr_set_d(betamass, beta.getMass(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
@@ -188,12 +200,39 @@ Double_t pw_nualpha_lbeta_lbeta(std::shared_ptr<Config> cfg,
 Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg,
                                 const Lepton &alpha, const Lepton &beta,
                                 const HNL &N) {
+  Particle gamma = Particle(); // this initializes an empty particle
+
+  return pw_lalpha_lbeta_nubeta(cfg, alpha, beta, gamma, N);
+}
+
+Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg,
+                                const Lepton &alpha, const Quark &beta, const Quark &gamma,
+                                const HNL &N) {
+  bool betaIsUp = false;
+  bool gammaIsUp = false;
+  Quark_Type bqt = beta.getQuarkType();
+  Quark_Type cqt = gamma.getQuarkType();
+
+  if(bqt == Quark_Type::up or bqt == Quark_Type::charm or bqt == Quark_Type::top) betaIsUp = true;
+  if(cqt == Quark_Type::up or cqt == Quark_Type::charm or cqt == Quark_Type::top) gammaIsUp = true;
+
+  if(not betaIsUp or gammaIsUp) return 0; // we need beta = up-type and gamma=down-type
+
+  Double_t NC = 3; // number of colors
+  Double_t d_NW = NC * cfg->getVUDsq(beta, gamma);
+
+  return pw_lalpha_lbeta_nubeta(cfg, alpha, beta, gamma, N, d_NW);
+}
+
+Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg,
+                                const Lepton &alpha, const Particle &beta, const Particle &gamma,
+                                const HNL &N, Double_t d_NW) {
 
   if (not N.mixesWith(alpha))
     return 0;
   if (alpha == beta)
     return 0;
-  if (N.getMass() < alpha.getMass() + beta.getMass())
+  if (N.getMass() < alpha.getMass() + beta.getMass() + gamma.getMass())
     return 0; // this means we don't have enough mass in the HNL to produce
               // decay product on-shell
 
@@ -210,13 +249,14 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg,
   mpfr_init2(NW, BITS);
   mpfr_init2(angle, BITS);
   mpfr_init2(HNLmass, BITS);
-  mpfr_set_d(NW, 1, MPFR_RNDD);
+
+  mpfr_set_d(NW, d_NW, MPFR_RNDD);
   mpfr_set_d(angle, N.getAngle(), MPFR_RNDD);
   mpfr_set_d(HNLmass, N.getMass(), MPFR_RNDD);
 
   Double_t xl = alpha.getMass() / N.getMass();
   Double_t xu = beta.getMass() / N.getMass();
-  Double_t xd = 0;
+  Double_t xd = gamma.getMass() / N.getMass();
 
   mpfr_t I;
   mpfr_init2(I, BITS);

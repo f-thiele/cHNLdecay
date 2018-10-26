@@ -23,6 +23,34 @@
 #include "partialWidths.h"
 
 Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                              const Quark &beta) {
+
+  // if charge conjugated channels exist and we have a majorana HNL we need to
+  // multiply the partial widths for them by 2
+  Double_t charge_factor = 1;
+  if (this->isMajorana()) {
+    charge_factor = 2;
+  }
+  Double_t pw = std::max(0., pw_nualpha_lbeta_lbeta(cfg, alpha, beta, *this));
+
+  return charge_factor*pw;
+}
+
+Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
+                              const Quark &beta, const Quark &gamma) {
+
+  // if charge conjugated channels exist and we have a majorana HNL we need to
+  // multiply the partial widths for them by 2
+  Double_t charge_factor = 1;
+  if (this->isMajorana()) {
+    charge_factor = 2;
+  }
+  Double_t pw = std::max(0., pw_lalpha_lbeta_nubeta(cfg, alpha, beta, gamma, *this));
+
+  return charge_factor*pw;
+}
+
+Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
                               const Lepton &beta, bool invisible) {
 
   // if charge conjugated channels exist and we have a majorana HNL we need to
@@ -53,20 +81,13 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
                                            beta.getPdgId() + 1},
                         la_lb_nub);
 
-  Double_t pw = nununu + nua_lb_lb + la_lb_nub;
-  pw *= charge_factor;
+  Double_t pw = nununu + nua_lb_lb + charge_factor * la_lb_nub;
 
   return pw;
 }
 
 Double_t HNL::getPartialWidthInv(std::shared_ptr<Config> cfg,
                                  const Lepton &alpha, const Lepton &beta) {
-  // if charge conjugated channels exist and we have a majorana HNL we need to
-  // multiply the partial widths for them by 2
-  Double_t charge_factor = 1;
-  if (this->isMajorana()) {
-    charge_factor = 2;
-  }
 
   Double_t nununu =
       std::max(0., pw_nualpha_nubeta_nubeta(cfg, alpha, beta, *this));
@@ -76,7 +97,7 @@ Double_t HNL::getPartialWidthInv(std::shared_ptr<Config> cfg,
                                            -(beta.getPdgId() + 1)},
                         nununu);
 
-  return charge_factor*nununu;
+  return nununu;
 }
 
 Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
@@ -94,7 +115,7 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
     this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(), m.getPdgId()},
                           temp);
 
-    dw += temp;
+    dw += charge_factor * temp;
 
   } else if (m.getMesonType() == MesonType::pseudoscalar and
              m.getCharge() == Charge::neutral) {
@@ -110,7 +131,7 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
     this->newDecayChannel(std::vector<Int_t>{alpha.getPdgId(), m.getPdgId()},
                           temp);
 
-    dw += temp;
+    dw += charge_factor * temp;
 
   } else if (m.getMesonType() == MesonType::vector and
              m.getCharge() == Charge::neutral) {
@@ -124,12 +145,11 @@ Double_t HNL::getPartialWidth(std::shared_ptr<Config> cfg, const Lepton &alpha,
     throw std::runtime_error("Cannot use meson with undefined MesonType");
   }
 
-  return charge_factor*dw;
+  return dw;
 }
-
 Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
                             const std::vector<Lepton> &leptons,
-                            const std::vector<Meson> &mesons) {
+                            const std::vector<Meson> &particles) {
   Double_t tw_lept = 0;
   Double_t tw_mes = 0;
   this->clearDecayChannels();
@@ -141,7 +161,7 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
         LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << t);
       tw_lept += t;
     }
-    for (auto m : mesons) {
+    for (auto m : particles) {
       Double_t t = this->getPartialWidth(cfg, l1, m);
       if (t > 0)
         LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
@@ -156,4 +176,43 @@ Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
   Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept;
 
   return totalWidth;
+
+}
+
+Double_t HNL::getTotalWidth(std::shared_ptr<Config> cfg,
+                            const std::vector<Lepton> &leptons,
+                            const std::vector<Quark> &particles) {
+  Double_t tw_lept = 0;
+  Double_t tw_mes = 0;
+  this->clearDecayChannels();
+
+  for (auto l1 : leptons) {
+    for (auto l2 : leptons) {
+      Double_t t = this->getPartialWidth(cfg, l1, l2);
+      if (t > 0)
+        LOG_DEBUG(l1.getName() << " " << l2.getName() << ": " << t);
+      tw_lept += t;
+    }
+    for (auto m : particles) {
+      for (auto n : particles) {
+        Double_t t = this->getPartialWidth(cfg, l1, m, n);
+        if (t > 0)
+          LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
+        tw_mes += t;
+      }
+      Double_t t = this->getPartialWidth(cfg, l1, m);
+      if (t > 0)
+        LOG_DEBUG(l1.getName() << " " << m.getName() << ": " << t);
+      tw_mes += t;
+    }
+  }
+  TF1 *f = new TF1("#Delta_{QCD}", qcd_coupling, 1, 100, 0);
+  Double_t qcd_corr = qcd_correction(f->Eval(this->getMass() / 1000.));
+  LOG_DEBUG("QCD correction: " << qcd_corr);
+  delete f;
+
+  Double_t totalWidth = (1 + qcd_corr) * tw_mes + tw_lept;
+
+  return totalWidth;
+
 }

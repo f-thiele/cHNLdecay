@@ -133,7 +133,7 @@ void plot_meson_pw(std::shared_ptr<Config> cfg, Lepton alpha,
 }
 
 void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons,
-             std::vector<Meson> mesons, HNL N, TString output, Int_t lowMass,
+             std::vector<Quark> mesons, HNL N, TString output, Int_t lowMass,
              Int_t highMass, Int_t stepsize) {
   std::vector<Double_t> res_m;
   std::vector<Double_t> res_mes;
@@ -152,6 +152,9 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons,
         tw_inv += N.getPartialWidthInv(cfg, l1, l2);
       }
       for (auto m : mesons) {
+        for (auto n : mesons) {
+          tw_mes += N.getPartialWidth(cfg, l1, m, n);
+        }
         tw_mes += N.getPartialWidth(cfg, l1, m);
       }
     }
@@ -172,6 +175,7 @@ void plot_br(std::shared_ptr<Config> cfg, std::vector<Lepton> leptons,
 
   TCanvas *c1 = new TCanvas("c1", "c1", 500, 400);
   c1->SetGrid();
+  c1->SetLogy();
 
   TGraph *g_mes = new TGraph(res_m.size(), &(res_m[0]), &(res_mes[0]));
   TGraph *g_lep = new TGraph(res_m.size(), &(res_m[0]), &(res_lep[0]));

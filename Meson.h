@@ -24,7 +24,7 @@
 
 enum class MesonType { Unknown, pseudoscalar, vector };
 enum class Charge { Unknown, charged, neutral };
-enum class Quark { Unknown, up, down, charm, strange, top, bottom };
+enum class Quark_Type { Unknown, up, down, charm, strange, top, bottom };
 
 class Meson : public Particle {
 public:
@@ -32,11 +32,11 @@ public:
     decayConstant = 0;
     charge = Charge::Unknown;
     type = MesonType::Unknown;
-    U = Quark::Unknown;
-    D = Quark::Unknown;
+    U = Quark_Type::Unknown;
+    D = Quark_Type::Unknown;
   }
   Meson(Int_t p, Double_t m, Double_t c, MesonType t, Charge q,
-        Quark u = Quark::Unknown, Quark d = Quark::Unknown)
+        Quark_Type u = Quark_Type::Unknown, Quark_Type d = Quark_Type::Unknown)
       : Particle(p, m) {
     decayConstant = c;
     charge = q;
@@ -70,9 +70,9 @@ public:
 
   Charge getCharge() const { return charge; }
 
-  Quark getU() const { return U; };
+  Quark_Type getU() const { return U; };
 
-  Quark getD() const { return D; };
+  Quark_Type getD() const { return D; };
 
   Double_t getDecayConstant() const { return decayConstant; }
 
@@ -91,7 +91,7 @@ private:
   std::map<TString, Double_t> vals;
   MesonType type;
   Charge charge;
-  Quark U;
-  Quark D;
+  Quark_Type U;
+  Quark_Type D;
 };
 #endif

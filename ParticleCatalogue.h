@@ -37,22 +37,22 @@ public:
     addTo(tau);
 
     Meson pi = Meson(211, 139.57018, 130.2, MesonType::pseudoscalar,
-                     Charge::charged, Quark::up, Quark::down);
+                     Charge::charged, Quark_Type::up, Quark_Type::down);
     addTo(pi);
     Meson K = Meson(321, 493.677, 155.6, MesonType::pseudoscalar,
-                    Charge::charged, Quark::up, Quark::strange);
+                    Charge::charged, Quark_Type::up, Quark_Type::strange);
     addTo(K);
     Meson D = Meson(411, 1869.62, 212, MesonType::pseudoscalar, Charge::charged,
-                    Quark::charm, Quark::down);
+                    Quark_Type::charm, Quark_Type::down);
     addTo(D);
     Meson Ds = Meson(431, 1968.47, 249, MesonType::pseudoscalar,
-                     Charge::charged, Quark::charm, Quark::strange);
+                     Charge::charged, Quark_Type::charm, Quark_Type::strange);
     addTo(Ds);
     Meson B = Meson(521, 5279.29, 187, MesonType::pseudoscalar, Charge::charged,
-                    Quark::up, Quark::bottom);
+                    Quark_Type::up, Quark_Type::bottom);
     addTo(B);
     Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
-                     Quark::charm, Quark::bottom);
+                     Quark_Type::charm, Quark_Type::bottom);
     addTo(Bc);
 
     Meson pi0 =
@@ -69,13 +69,13 @@ public:
     addTo(etac);
 
     Meson rho = Meson(213, 775.11, 162000, MesonType::vector, Charge::charged,
-                      Quark::up, Quark::down);
+                      Quark_Type::up, Quark_Type::down);
     addTo(rho);
     Meson Dstar = Meson(413, 2010.26, 535000, MesonType::vector,
-                        Charge::charged, Quark::charm, Quark::down);
+                        Charge::charged, Quark_Type::charm, Quark_Type::down);
     addTo(Dstar);
     Meson Dstars = Meson(431, 2112.1, 650000, MesonType::vector,
-                         Charge::charged, Quark::charm, Quark::strange);
+                         Charge::charged, Quark_Type::charm, Quark_Type::strange);
     addTo(Dstars);
 
     Double_t weinberg = 0.2223;

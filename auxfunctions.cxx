@@ -193,31 +193,10 @@ TGraph *create_graph(Double_t xd, Double_t xl, Float_t low, Float_t high,
 
 Double_t ctauToU2(std::shared_ptr<Config> cfg, Double_t target,
                   const std::vector<Lepton> &leptons,
-                  const std::vector<Meson> &mesons, HNL &N, Double_t start,
-                  Double_t tol, Double_t stepsize) {
+                  const std::vector<Quark> &quarks, HNL &N, Double_t start) {
   N.setAngle(start);
-  Double_t ctau = gamma2ctau(cfg, N.getTotalWidth(cfg, leptons, mesons));
-  Double_t found_angle = start;
-  UInt_t iterations = 0;
-  Double_t prev_ctau = ctau;
-
-  for (Double_t angle = start; abs(target - ctau) > tol; angle *= stepsize) {
-    iterations++;
-    N.setAngle(angle);
-    prev_ctau = ctau;
-    ctau = gamma2ctau(cfg, N.getTotalWidth(cfg, leptons, mesons));
-    if (abs(target - ctau) > abs(target - prev_ctau)) {
-      LOG_WARNING("Stopped at angle="
-                  << angle << " with ctau=" << ctau
-                  << " as distance increased to previous ctau=" << prev_ctau);
-      break;
-    }
-    found_angle = angle;
-    if (iterations % 1000) {
-      std::cout << "\rangle=" << angle << ", ctau=" << ctau << std::flush;
-    }
-  }
-  return found_angle;
+  Double_t ctau = gamma2ctau(cfg, N.getTotalWidth(cfg, leptons, quarks));
+  return start/target*ctau;
 }
 
 TString pdgIdToLaTeX(Int_t p) {
