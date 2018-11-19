@@ -49,6 +49,21 @@ This implementation tries to correctly implement equations from [arXiv:1805.0856
 Paper list:
 
   - K. Bondarenko, A. Boyarsky, D. Gorbunov and O. Ruchayskiy, *Phenomenology of GeV-scale Heavy Neutral Leptons*, [arXiv:1805.08567v2 [hep-ph]](https://arxiv.org/abs/1805.08567v2)
+  
+## How to cite this project?
+
+Please cite this project as follows:
+
+```
+@misc{thiele_cHNLdecay_2018,
+  author = {Thiele, Fabian A.J.},
+  title = {cHNLdecay},
+  year = {2018},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/f-thiele/cHNLdecay}},
+}
+```
 
 ## License
 This project is licensed under the terms of the GPL v3 or any later version (**GPL-3.0-or-later**).
