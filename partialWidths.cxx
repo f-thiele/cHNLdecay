@@ -236,13 +236,11 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg,
     return 0; // this means we don't have enough mass in the HNL to produce
               // decay product on-shell
 
-  mpfr_t fermiC, fermiCsq, pi;
+  mpfr_t fermiCsq, pi;
   unsigned int BITS = cfg->getBITS();
-  mpfr_init2(fermiC, BITS);
   mpfr_init2(fermiCsq, BITS);
   mpfr_init2(pi, BITS);
   cfg->getFermiCsq(fermiCsq);
-  cfg->getFermiC(fermiC);
   cfg->getPi(pi);
 
   mpfr_t NW, angle, HNLmass;
@@ -277,7 +275,7 @@ Double_t pw_lalpha_lbeta_nubeta(std::shared_ptr<Config> cfg,
   mpfr_mul(result, result, I, MPFR_RNDD);
 
   Double_t rval = mpfr_get_d(result, MPFR_RNDD);
-  mpfr_clears(fermiC, fermiCsq, pi, I, NW, angle, HNLmass, result, temp,
+  mpfr_clears(fermiCsq, pi, I, NW, angle, HNLmass, result, temp,
               (mpfr_ptr)0);
 
   return rval;
