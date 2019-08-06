@@ -53,8 +53,6 @@ Double_t F(Double_t xi, Double_t yhp) {
 }
 
 
-
-
 // ------ Meson form factors
 Double_t compute_ffactor(Meson h, Meson hp, Double_t q2, bool opt) {
 	
@@ -588,7 +586,7 @@ Double_t pw_prodFromBmeson_leptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l
 	mpfr_t fermiC, fermiCsq, pi, fh;
 	unsigned int BITS = cfg->getBITS();
 	Double_t fh_ = meson.getDecayConstant(); 
-	std::cout<<"fh: " << fh_ << std::endl;
+	//std::cout<<"fh: " << fh_ << std::endl;
 	mpfr_init2(fermiC, BITS);
 	mpfr_init2(fermiCsq, BITS);
 	mpfr_init2(pi, BITS);

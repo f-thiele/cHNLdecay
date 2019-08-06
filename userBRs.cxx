@@ -36,7 +36,7 @@ bool majorana = true;
 
 // variables used for searching for angle / parsing file for angles
 bool isLoad = false;
-TString loadPath;
+//TString loadPath;
 Double_t ctau = 0;
 
 // sensible default for loglevel
@@ -227,6 +227,7 @@ Double_t decayBR_2body_semilept(int idl, int idH, Double_t mN, Double_t tau0mN){
 	totw = hbar/tau0mN;
 	return pw/totw;
 }
+
 
 
 
