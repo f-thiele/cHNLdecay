@@ -360,16 +360,17 @@ int main(int argc, char **argv) {
 		if(dID==0){
 			//Double_t HNLmass_GeV = ;
 			for (size_t i(0); i<mixes_with.size(); i++){
-				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass*1e-3, tau0);
+				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, tau0);
+				//std::cout<<"leptonic"<<std::endl;
 			}
 		}
 		
 		else{
 			for (size_t i(0); i<mixes_with.size(); i++){
-				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), dID, HNLmass*1e-3, tau0);
+				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), dID, HNLmass, tau0);
+				//std::cout<<"semileptonic"<<std::endl;
 			}
-		}
-		
+		}	
 	}
   //Double_t test2 = prodBR_lept(521, 13, 3500., 5.e-12);
   //std::cout<<"test " << test << std::endl;

@@ -498,7 +498,7 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 	cfg->getFermiC(fermiC);
 	cfg->getPi(pi);
 	
-	std::cout << "fermiC: " << mpfr_get_d(fermiC, MPFR_RNDD) << std::endl;
+	//std::cout << "fermiC: " << mpfr_get_d(fermiC, MPFR_RNDD) << std::endl;
 	
 	/** Get high precision values **/
 	Double_t ml = l.getMass(); 
@@ -514,7 +514,7 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 	Double_t Vud_ = 1.;
 	//std::cout<<"meson name: " << meson.getName() << std::endl;
 	//std::cout<<"mesonp name: " << mesonp.getName() << std::endl;
-	std::cout << "VCKM elmt: " << Vud_ << std::endl;
+	//std::cout << "VCKM elmt: " << Vud_ << std::endl;
 	
 	mpfr_t yhp, yl, yN, mh, q2, xi, U2, Vud2;
 	// initialisation
@@ -561,7 +561,7 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 	Double_t bmin = pow(ml/mh_ + mN/mh_,2); Double_t bmax = pow(1-(mhp/mh_),2);
 	for(int i(1); i<=3; ++i){
 		IP_ += integral_fP(bmin, bmax, 5000, cfg, N, l, meson, mesonp, i);
-		std::cout << "INTEGRAL STEP " << i << " : " << IP_ << std::endl;
+		//std::cout << "INTEGRAL STEP " << i << " : " << IP_ << std::endl;
 	}
 	
 	/** Compute whole PW value **/

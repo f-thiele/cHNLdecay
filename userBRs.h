@@ -8,6 +8,8 @@
 #include "Meson.h"
 #include "Quark.h"
 
+//testing functions (error throwers)
+void test_value(Double_t var, Double_t minval, Double_t maxval, std::string varname);
 
 // utils
 void split(const std::string &s, char delim, std::vector<std::string> &elems);
