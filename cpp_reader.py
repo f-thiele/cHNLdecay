@@ -1,8 +1,17 @@
 from subprocess import Popen, PIPE
 
-output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', '521', '--generations', '13', '--mass', '3500', '--angle', '3.5e-6'], stdout=PIPE)
-out = output.stdout.read()
-
-out_pw = out.split()[0];
-
-print out_pw;
+def get_prod_BR(HNLmassinMeV, HNLcoupling, B_ID, meson_ID, lepton_ID):
+	
+	# 2 body (leptonic) decay
+	if(meson_ID==0): 
+		output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), '--generations', str(lepton_ID), '--mass', str(HNLmassinMeV), '--angle', str(HNLcoupling)], stdout=PIPE)
+	
+	# 3 body (semileptonic) decay
+	else:
+		output = Popen(['./cHNLdecay', '--mainmode', '1', '--BmesonID', str(B_ID), '--generations', str(lepton_ID), '--mass', str(HNLmassinMeV), '--angle', str(HNLcoupling)], stdout=PIPE)
+	
+	
+	out = output.stdout.read()
+	out_BR = float(out.split()[0]);
+	
+	return out_BR;

@@ -50,11 +50,12 @@ int main(int argc, char **argv) {
   auto cfg = std::make_shared<Config>(); // set BITS and initialize constants
 	
 	// mode: 0 -> decay (initial code, default), 1: production BR
-  bool mainmode(0);
+  int mainmode(0);
   
   // initialize the variables that define our HNL
   Int_t HNLmass = 0;
   Double_t angle = 0;
+  Double_t tau0 = 0;
   std::vector<Lepton> mixes_with;
   bool majorana = true;
 
@@ -64,7 +65,7 @@ int main(int argc, char **argv) {
   Double_t ctau = 0;
   
   //variables for production BR
-  int BID, dID;
+  int BID(521), dID(0);
 
   // sensible default for loglevel
   gLOGLEVEL = Level::INFO;
@@ -82,6 +83,7 @@ int main(int argc, char **argv) {
         {"loglevel", required_argument, 0, 'l'},
         {"generations", required_argument, 0, 'g'},
         {"angle", required_argument, 0, 'u'},
+        {"lifetime-ns", required_argument, 0, 't'},
         {"mass", required_argument, 0, 'm'},
         {"majorana", required_argument, 0, 'c'},
         {"search-ctau", required_argument, 0, 's'},
@@ -112,11 +114,8 @@ int main(int argc, char **argv) {
 
 	// mainmode
 	case 'M':
-      if(std::atoi(optarg)==1)
-        mainmode = true;
-      else
-        mainmode = false;
-	  break;
+      mainmode = std::atoi(optarg);
+      break;
 	
     case 'l': {
       TString x = TString(optarg);
@@ -154,6 +153,10 @@ int main(int argc, char **argv) {
 
     case 'u':
       angle = std::atof(optarg);
+      break;
+     
+    case 't':
+      tau0 = std::atof(optarg);
       break;
 
     case 'm':
@@ -354,8 +357,17 @@ int main(int argc, char **argv) {
 //		std::cout<<"hello: "<<mixes_with[0].getPdgId()<<std::endl;
 //		std::cout<<"BID: "<<BID<<std::endl;
 		
-		for (size_t i(0); i<mixes_with.size(); i++){
-			std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, angle);
+		if(dID==0){
+			//Double_t HNLmass_GeV = ;
+			for (size_t i(0); i<mixes_with.size(); i++){
+				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass*1e-3, tau0);
+			}
+		}
+		
+		else{
+			for (size_t i(0); i<mixes_with.size(); i++){
+				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), dID, HNLmass*1e-3, tau0);
+			}
 		}
 		
 	}
