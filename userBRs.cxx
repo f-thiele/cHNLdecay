@@ -95,10 +95,10 @@ Meson rho = 	Meson(213, 775.4, 208.5, MesonType::pseudoscalar, Charge::charged,
 				Quark_Type::up, Quark_Type::down);
 Meson rho0 = 	Meson(113, 775.49, 208.5, MesonType::pseudoscalar, Charge::neutral,
 				Quark_Type::up, Quark_Type::up);
-Meson K = 		Meson(311, 493.677, 159.8, MesonType::pseudoscalar, Charge::charged,
-				Quark_Type::strange, Quark_Type::up);
-Meson K0 = 		Meson(321, 493.677, 159.8, MesonType::pseudoscalar, Charge::neutral,
+Meson K0 = 		Meson(311, 493.677, 159.8, MesonType::pseudoscalar, Charge::neutral,
 				Quark_Type::strange, Quark_Type::down);
+Meson K = 		Meson(321, 493.677, 159.8, MesonType::pseudoscalar, Charge::charged,
+				Quark_Type::strange, Quark_Type::up);
 Meson K0st = 	Meson(313, 493.677, 159.8, MesonType::vector, Charge::neutral,
 				Quark_Type::strange, Quark_Type::down);
 Meson Kst = 	Meson(323, 891.92, 212, MesonType::vector, Charge::charged,
@@ -314,20 +314,49 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 	bool isP(1);
 	int i,j;
 	
-	switch(idB){
-		case 511: B = B0; j = 0; tau0B = tau0B0; break;
-		case 521: B = Bp; i = 0; tau0B = tau0Bp; break;
-		case 531: B = Bs; j = 1; tau0B = tau0Bs; break;
-		case 541: B = Bc; i = 1; tau0B = tau0Bc; break;
-		default: std::cerr<<"ERROR: Beauty meson ID not among the pre-programmed list of semileptonic decays (511, 521, 531, 541)!"<<std::endl;	
-	}
-	
 	// try to do it with jkey
-	switch(idH){
-		case 111:H = pi; j = 0; break;
-		default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {211}!"<<std::endl; return 1.;
+	if(idB==511){
+		B = B0; j = 0; tau0B = tau0B0; 
+		switch(idH){
+			case 211: H = pi; j = 0; break;
+			case 411: H = D; j = 0; break;
+			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {211} for B0!"<<std::endl; return 1.;
+		}
 
 	}
+	
+	else if(idB==521){
+		B = Bp; i = 0; tau0B = tau0Bp;
+		switch(idH){
+			case 111: H = pi0; j = 0; break;
+			case 421: H = D0bar; j = 0; break;
+			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {111, 421} for B!"<<std::endl; return 1.;
+		}
+	}
+	
+	else if(idB==531){
+		B = Bs; j = 1; tau0B = tau0Bs;
+		switch(idH){
+			case 321: H = K; j = 0; break;
+			case 311: H = K0; j = 0; break;
+			case 431: H = Ds; j = 0; break;
+			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {321, 431} for Bs!"<<std::endl; return 1.;
+		}
+		
+	}
+		
+	else if(idB==541){
+		B = Bc; i = 1; tau0B = tau0Bc;
+		switch(idH){
+			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {} for Bc!"<<std::endl; return 1.;
+		}
+		
+	}
+	
+	else std::cerr<<"ERROR: Beauty meson ID not among the pre-programmed list of semileptonic decays {511, 521, 531, 541}!"<<std::endl;	
+	
+	
+	
 		
 	switch(idB){
 		case 11: l = el; break;
@@ -354,7 +383,7 @@ Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t tau0mN){
 	Double_t U2 = tau0_to_U2(mN, tau0mN);
 	
 	test_value(U2, 0., 1., "coupling U_{muN}^2");
-	std::cout<<"U2:"<<U2<<std::endl;
+	//std::cout<<"U2:"<<U2<<std::endl;
 	//Declare the HNL
 	HNL N = HNL("HNL", mN, U2, mixes_with);
 	N.setMajorana(majorana);
@@ -379,7 +408,7 @@ Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t tau0mN){
 	pw = pw_charged_pseudoscalar_mesons(cfg, l, H, N);
 	//std::cout << "pw: " << pw << std::endl;
 	totw = hbar/(tau0mN*1e-9);
-	std::cout << "totw: " << totw << std::endl;
+	//std::cout << "totw: " << totw << std::endl;
 	
 	test_value(pw/totw, 0., 1., "Production branching ratio");
 	return pw/totw;

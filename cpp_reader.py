@@ -49,15 +49,20 @@ import sys
 
 def plot_prod_BR():
 	
-	BR1 = [];
-	BR2 = [];
-	BR3 = [];
-	M = (0.5, 1, 2, 4)
+	BR11 = [];
+	BR12 = [];
+	BR21 = [];
+	BR22 = [];
+	M = (0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6)
 	# Fixed lifetime 1ns
-	lifetime=10 #1ns
+	lifetime=50 #1ns
 	for m in M:
-		BR1.append(get_prod_BR(m, lifetime, 521, 0, 13))
-		BR2.append(get_prod_BR(m, lifetime, 521, 111, 13))
+		BR11.append(get_prod_BR(m, lifetime, 511, 211, 13))
+		BR12.append(get_prod_BR(m, lifetime, 511, 411, 13))
+		BR21.append(get_prod_BR(m, lifetime, 521, 0, 13))
+		BR22.append(get_prod_BR(m, lifetime, 521, 111, 13))
+		
+		
 		#np.append(BR3, 0.5, get_prod_BR(m, 1, 511, 0, 13))
 	
 	plt.figure()
@@ -65,8 +70,10 @@ def plot_prod_BR():
 	plt.title(r'BR prod, for fixed $\tau_N$ = '+str(lifetime)+' ns')
 	plt.xlabel("$m_N$ [GeV]", fontsize=14)
 	plt.ylabel('BR', fontsize=14)
-	plt.plot(M, BR1, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \mu^+ N$')
-	plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \pi^- \mu^+ N$')
+	plt.plot(M, BR11, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow \pi^- \mu^+ N$')
+	plt.plot(M, BR12, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow D^- \mu^+ N$')
+	plt.plot(M, BR21, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$B^+ \rightarrow \mu^+ N$')
+	plt.plot(M, BR22, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^+ \rightarrow \pi^0 \mu^+ N$')
 	plt.legend()
 	plt.savefig('prod_BRs_check.pdf');
 
@@ -89,7 +96,7 @@ def plot_decay_BR():
 	plt.xlabel("$m_N$ [GeV]", fontsize=14)
 	plt.ylabel('BR', fontsize=14)
 	plt.plot(M, BR1, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$N \rightarrow \mu^\pm \pi^\mp $')
-	plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$N \rightarrow \mu^\pm K^\mp $')
+	#plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$N \rightarrow \mu^\pm K^\mp $')
 	plt.legend()
 	plt.savefig('decay_BRs_check.pdf');
 	

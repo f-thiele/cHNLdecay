@@ -399,7 +399,7 @@ int main(int argc, char **argv) {
 		//std::cout << "d2ID" << d2ID <<std::endl;
 		std::cout<<decayBR_lepton_meson(lAID, d2ID, HNLmass, tau0);
 		
-		std::cout<<"\ngetTotalWidth: "<< N.getTotalWidth(cfg,all_leptons,mesons)<<std::endl;
+		//std::cout<<"\ngetTotalWidth: "<< N.getTotalWidth(cfg,all_leptons,mesons)<<std::endl;
 	}
 	else if(mainmode==3) std::cout<<decayBR_lepton_lepton_neutrino(lAID, lBID, nuBID, HNLmass, tau0);
 

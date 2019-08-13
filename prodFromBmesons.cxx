@@ -25,13 +25,14 @@ Double_t kallen(Double_t a, Double_t b, Double_t c) {
 
 Double_t Lambda(Double_t xi, Double_t yhp, Double_t yl, Double_t yN) {
 	//std::cout<<"Lambda " << sqrt(kallen(1, pow(yhp, 2), xi)) * sqrt(kallen(xi, pow(yN, 2), pow(yl, 2))) << std::endl;
-	if (kallen(1, pow(yhp, 2), xi) < 0) std::cout << " _____kallen(1, pow(yhp, 2), xi) < 0_____" << kallen(1, pow(yhp, 2), xi) << std::endl;
+	//if (kallen(1, pow(yhp, 2), xi) < 0) std::cout << " _____kallen(1, pow(yhp, 2), xi) < 0_____" << kallen(1, pow(yhp, 2), xi) << std::endl;
 	if (kallen(xi, pow(yN, 2), pow(yl, 2)) < 0){
-		 std::cout << " _____kallen(xi, pow(yN, 2), pow(yl, 2)) < 0_____ = " << kallen(xi, pow(yN, 2), pow(yl, 2)) << std::endl;
-		 std::cout << " xi " << xi << std::endl;
-		 std::cout << " yhp " << yhp << std::endl;
-		 std::cout << " yl " << yl << std::endl;
-		 std::cout << " yN " << yN << std::endl;
+		//std::c
+		// std::cout << " _____kallen(xi, pow(yN, 2), pow(yl, 2)) < 0_____ = " << kallen(xi, pow(yN, 2), pow(yl, 2)) << std::endl;
+		// std::cout << " xi " << xi << std::endl;
+		// std::cout << " yhp " << yhp << std::endl;
+		// std::cout << " yl " << yl << std::endl;
+		// std::cout << " yN " << yN << std::endl;
 	 }
 	return sqrt(abs(kallen(1, pow(yhp, 2), xi))) * sqrt(abs(kallen(xi, pow(yN, 2), pow(yl, 2))));
 	//return kallen(1, pow(yhp, 2), xi) * kallen(xi, pow(yN, 2), pow(yl, 2));
@@ -78,7 +79,7 @@ Double_t compute_ffactor(Meson h, Meson hp, Double_t q2, bool opt) {
 				a1 = -7.11;
 				a2 = 66;
 				factor = 1.;
-			case 313:			//K
+			case 321:			//K
 			case 323:			//Kstar
 				Mpole = 5325;
 				a0 = 0.360;
@@ -109,7 +110,7 @@ Double_t compute_ffactor(Meson h, Meson hp, Double_t q2, bool opt) {
 				a1 = -2.45;
 				a2 = 33;
 				factor = 1.;
-			case 313:			//K
+			case 321:			//K
 			case 323:			//Kstar
 				Mpole = 5650;
 				a0 = 0.233;
@@ -434,8 +435,9 @@ Double_t integral_fP(Double_t a, Double_t b, Double_t nsteps, std::shared_ptr<Co
 	
 	Double_t step = (b-a)/nsteps;
 	if(step<0.){
-			std::cout << "step: " << step << std::endl;
-			std::cout << "mN: " << N.getMass() << std::endl;
+		std::cerr<<"-------\nForbidden kinematics for mN = " << N.getMass() << " for the decay " << meson.getPdgId() << " to " << mesonp.getPdgId() <<" " << l.getPdgId()<<" N. Please change input HNL features.\n--------"<<std::endl;
+		//	std::cout << "step: " << step << std::endl;
+		//	std::cout << "mN: " << N.getMass() << std::endl;
 			return 0.;
 		}
 	mpfr_t res;
