@@ -21,6 +21,8 @@ Double_t tau0_to_U2(Double_t mN, Double_t tau0mN);
 //BRs
 Double_t prodBR_lept(int idB, int idl, Double_t mN, Double_t tau0mN);
 Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN);
-Double_t decayBR_2body_semilept(int idl, int idH, Double_t mN, Double_t tau0mN);
+//Double_t decayBR_2body_semilept(int idl, int idH, Double_t mN, Double_t tau0mN);
+Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t tau0mN);
+Double_t decayBR_lepton_lepton_neutrino(int idlA, int idlB, int idnuB, Double_t mN, Double_t tau0mN);
 
 #endif
