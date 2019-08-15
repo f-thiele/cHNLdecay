@@ -360,9 +360,7 @@ int main(int argc, char **argv) {
 	  // EXAMPLE for further checks and configurations
 	  // ----------
 	  // N.setMass(3000);
-	  // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));
-
-	  
+	  // LOG_INFO("pw: " << N.getPartialWidth(cfg, mu, rho));  
 	}
 	
 	// Production BR
@@ -375,10 +373,10 @@ int main(int argc, char **argv) {
 				std::cout<<prodBR_lept(BID, mixes_with[i].getPdgId(), HNLmass, tau0);
 				//std::cout<<"leptonic"<<std::endl;
 			}
-		}
-		
+		}	
 		else{
 			for (size_t i(0); i<mixes_with.size(); i++){
+				//std::cout << "avant prodBR_semilept" << std::endl;
 				std::cout<<prodBR_semilept(BID, mixes_with[i].getPdgId(), d1ID, HNLmass, tau0);
 				//std::cout<<"semileptonic"<<std::endl;
 			}
@@ -403,8 +401,6 @@ int main(int argc, char **argv) {
 	}
 	else if(mainmode==3) std::cout<<decayBR_lepton_lepton_neutrino(lAID, lBID, nuBID, HNLmass, tau0);
 
-	
-	
 	//Double_t test2 = prodBR_lept(521, 13, 3500., 5.e-12);
 	//std::cout<<"test " << test << std::endl;
 	//std::cout<<"test2 " << test2 << std::endl;

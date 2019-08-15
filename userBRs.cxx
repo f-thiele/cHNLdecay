@@ -87,13 +87,15 @@ Meson Bc = Meson(541, 6275.1, 434, MesonType::pseudoscalar, Charge::charged,
 
 // Daughters mesons
 	
-Meson pi = 		Meson(211, 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged, 
-				Quark_Type::up, Quark_Type::down);
+//Meson pi = 		Meson(211, 139.57018, 130.2, MesonType::pseudoscalar, Charge::charged, 
+//				Quark_Type::up, Quark_Type::down);
+				
+Meson pi = pc.getMeson(211);
 Meson pi0 = 	Meson(111, 139.57018, 130.2, MesonType::pseudoscalar, Charge::neutral,
 				Quark_Type::up, Quark_Type::up);
-Meson rho = 	Meson(213, 775.4, 208.5, MesonType::pseudoscalar, Charge::charged,
+Meson rho = 	Meson(213, 775.4, 208.5, MesonType::vector, Charge::charged,
 				Quark_Type::up, Quark_Type::down);
-Meson rho0 = 	Meson(113, 775.49, 208.5, MesonType::pseudoscalar, Charge::neutral,
+Meson rho0 = 	Meson(113, 775.49, 208.5, MesonType::vector, Charge::neutral,
 				Quark_Type::up, Quark_Type::up);
 Meson K0 = 		Meson(311, 493.677, 159.8, MesonType::pseudoscalar, Charge::neutral,
 				Quark_Type::strange, Quark_Type::down);
@@ -105,7 +107,7 @@ Meson Kst = 	Meson(323, 891.92, 212, MesonType::vector, Charge::charged,
 				Quark_Type::strange, Quark_Type::up);
 Meson D = 		Meson(411, 1869.62, 222.6, MesonType::pseudoscalar, Charge::charged,
 				Quark_Type::down, Quark_Type::charm);
-Meson Dstar = 	Meson(413, 2010.26, 535000, MesonType::pseudoscalar, Charge::charged, 
+Meson Dstar = 	Meson(413, 2010.26, 535000, MesonType::vector, Charge::charged, 
 				Quark_Type::charm, Quark_Type::down);
 Meson D0bar = 	Meson(421, 1864.84, 212, MesonType::pseudoscalar, Charge::charged,
 				Quark_Type::up, Quark_Type::charm);
@@ -301,9 +303,7 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 	Double_t pw, totw, tau0B;
 	Double_t U2 = tau0_to_U2(mN, tau0mN);
 	
-	test_value(U2, 0., 1., "coupling U_{muN}^2");
-
-	
+	test_value(U2, 0., 1., "coupling U_{muN}^2");	
 	
 	//Declare the HNL
 	HNL N = HNL("HNL", mN, U2, mixes_with);
@@ -311,7 +311,7 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 	N.setMajorana(majorana);
 	
 	Meson B; Meson H; Lepton l;
-	bool isP(1);
+	//bool isP(1);
 	int i,j;
 	
 	// try to do it with jkey
@@ -319,16 +319,17 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 		B = B0; j = 0; tau0B = tau0B0; 
 		switch(idH){
 			case 211: H = pi; j = 0; break;
+			case 213: H = rho; j = 0; break;
 			case 411: H = D; j = 0; break;
 			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {211} for B0!"<<std::endl; return 1.;
 		}
-
 	}
 	
 	else if(idB==521){
 		B = Bp; i = 0; tau0B = tau0Bp;
 		switch(idH){
 			case 111: H = pi0; j = 0; break;
+			case 113: H = rho0; j = 0; break;
 			case 421: H = D0bar; j = 0; break;
 			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {111, 421} for B!"<<std::endl; return 1.;
 		}
@@ -342,7 +343,6 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 			case 431: H = Ds; j = 0; break;
 			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {321, 431} for Bs!"<<std::endl; return 1.;
 		}
-		
 	}
 		
 	else if(idB==541){
@@ -350,7 +350,6 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 		switch(idH){
 			default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {} for Bc!"<<std::endl; return 1.;
 		}
-		
 	}
 	
 	else std::cerr<<"ERROR: Beauty meson ID not among the pre-programmed list of semileptonic decays {511, 521, 531, 541}!"<<std::endl;	
@@ -364,8 +363,12 @@ Double_t prodBR_semilept(int idB, int idl, int idH, Double_t mN, Double_t tau0mN
 		case 15: l = tau; break;
 	}
 	
-	if(isP)	pw = pow(VCKM[i][j],2)*pw_prodFromBmeson_semileptonic(cfg, N, l, B, H); // pseudoscalar meson
-	else 	pw = pow(VCKM[i][j],2)*pw_prodFromBmeson_semileptonic(cfg, N, l, B, H); // vector meson
+	if(H.getMesonType()==MesonType::pseudoscalar) pw = pow(VCKM[i][j],2)*pw_prodFromBmeson_semileptonic(cfg, N, l, B, H); // pseudoscalar meson
+	else if(H.getMesonType()==MesonType::vector) {
+		//std::cout << "else"<<std::endl;
+		pw = 1e-5*pow(VCKM[i][j],2)*pw_prodFromBmeson_semileptonic(cfg, N, l, B, H); // vector meson
+	}
+	else std::cerr << "ERROR: Meson::getMesonType is neither MesonType::pseudoscalar nor MesonType::vector" << std::endl;
 	totw = hbar/tau0B;
 	//totw = N.getTotalWidth(cfg, )
 	test_value(pw/totw, 0., 1., "Production branching ratio");
@@ -393,10 +396,11 @@ Double_t decayBR_lepton_meson(int idl, int idH, Double_t mN, Double_t tau0mN){
 	
 	switch(idH){
 		case 211: H = pi; j = 0; break;
+		case 213: H = rho0; j = 0; break;
 		//case 321: H = K; j = 0; break;
 		//case 411: H = D; j = 0; break;
 		//case 213: H = rho; j = 0; break;
-		default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {211}!"<<std::endl;	
+		default: std::cerr<<"ERROR: Meson ID not among the pre-programmed list {211, 213}!"<<std::endl;	
 	}
 		
 	switch(idl){

@@ -1,4 +1,4 @@
-
+#include "formFactors.h"
 #include "prodFromBmesons.h"
 #include "Config.h"
 #include "HNL.h"
@@ -54,95 +54,8 @@ Double_t F(Double_t xi, Double_t yhp) {
 }
 
 
-// ------ Meson form factors
-Double_t compute_ffactor(Meson h, Meson hp, Double_t q2, bool opt) {
-	
-	// Uses equation (C.16) of arXiv paper
-	
-	Double_t 	Mpole, mh, mhp, a0, a1, a2, z, tplus, t0, factor, sum;
-	Int_t 		IDh, IDhp;
-	
-	mh =  h.getMass(); 		mhp =  hp.getMass();
-	IDh = h.getPdgId();		IDhp = hp.getPdgId();
-	
-	if(opt){		//form factor fplus
-				
-		switch(IDhp){	
-			case 411:			//D
-			case 413:			//Dstar
-			case 421:			//D0bar
-			case 423:			//D0starbar
-			case 431:			//Ds
-			case 433:			//Dsstar
-				//Mpole = inf;
-				a0 = 0.909;
-				a1 = -7.11;
-				a2 = 66;
-				factor = 1.;
-			case 321:			//K
-			case 323:			//Kstar
-				Mpole = 5325;
-				a0 = 0.360;
-				a1 = -0.828;
-				a2 = 1.1;
-				factor = 1/(1-q2/pow(Mpole, 2));
-			case 211:			//pi
-			case 111:			//pi0
-				Mpole = 5325;
-				a0 = 0.404;
-				a1 = -0.68;
-				a2 = -0.86;	
-				factor = 1/(1-q2/pow(Mpole, 2));
-		}
-	}
-	
-	else{						//form factor f0
-		
-		switch(IDhp){	
-			case 411:			//D
-			case 413:			//Dstar
-			case 421:			//D0bar
-			case 423:			//D0starbar
-			case 431:			//Ds
-			case 433:			//Dsstar
-				//Mpole = inf;
-				a0 = 0.794;
-				a1 = -2.45;
-				a2 = 33;
-				factor = 1.;
-			case 321:			//K
-			case 323:			//Kstar
-				Mpole = 5650;
-				a0 = 0.233;
-				a1 = 0.197;
-				a2 = 0.18;
-				factor = 1/(1-q2/pow(Mpole, 2));
-				//std::cout<<"factor " <<std::endl;
-			case 211:			//pi
-			case 111:			//pi0
-				Mpole = 5650;
-				a0 = 0.490;
-				a1 = -1.61;
-				a2 = 0.93;	
-				factor = 1/(1-q2/pow(Mpole, 2));
-				
-				//std::cout<<"factor " <<std::endl;
-		}
-	}
-	
-	tplus = pow(mh+mhp, 2);
-	t0 	  = (mh+mhp)*pow(sqrt(mh)-sqrt(mhp),2);
-	
-	z = sqrt(tplus-q2) - sqrt(tplus-t0);
-	z = z/(sqrt(tplus-q2) + sqrt(tplus-t0));
-	
-	sum  = a0;
-	sum += a1*(z 		- 1/3*pow(z,3));
-	sum += a2*(pow(z,2)	+ 2/3*pow(z,3));
-	
-	
-	return factor*sum;
-}
+
+
 
 
 
@@ -225,7 +138,7 @@ Double_t compute_fP1(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, 
 	mpfr_div(res, res, xi3, MPFR_RNDD); //////////////////////////////////
 	mpfr_div_ui(res, res, 3, MPFR_RNDD);
 	
-	//std::cout << "res 2: " << mpfr_get_d(res,MPFR_RNDD) << std::endl;
+	//std::cout << "fP1: res 2: " << mpfr_get_d(res,MPFR_RNDD) << std::endl;
 	
 	//mpfr_div(res, res, 3., MPFR_RNDD);
 	
@@ -321,7 +234,7 @@ Double_t compute_fP2(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, 
 	mpfr_div(res, res, xi3, MPFR_RNDD); /////////////////////////////
 	mpfr_div_ui(res, res, 2, MPFR_RNDD);
 	
-		//std::cout << "res 4: " << mpfr_get_d(res,MPFR_RNDD) << std::endl;
+	//std::cout << "fP2: res 4: " << mpfr_get_d(res,MPFR_RNDD) << std::endl;
 	
 	//mpfr_div(res, res, 3., MPFR_RNDD);
 	
@@ -417,7 +330,7 @@ Double_t compute_fP3(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, 
 	mpfr_div(res, res, xi3, MPFR_RNDD); ///////////////
 	mpfr_div_ui(res, res, 2, MPFR_RNDD);
 	
-		//std::cout << "res 4: " << mpfr_get_d(res,MPFR_RNDD) << std::endl;
+	//std::cout << "fP3: res 4: " << mpfr_get_d(res,MPFR_RNDD) << std::endl;
 	
 	//mpfr_div(res, res, 3., MPFR_RNDD);
 	
@@ -477,6 +390,7 @@ Double_t integral_fP(Double_t a, Double_t b, Double_t nsteps, std::shared_ptr<Co
 		
 		fstep_ = step*(1./6*f1 + 4./6*f2 + 1./6*f3);
 		
+		//std::cout << "ffstep_: " << fstep_ << std::endl;
 		mpfr_t fstep;
 		mpfr_init2(fstep, BITS); 
 		mpfr_set_d(fstep, fstep_, MPFR_RNDD);
@@ -488,98 +402,6 @@ Double_t integral_fP(Double_t a, Double_t b, Double_t nsteps, std::shared_ptr<Co
 }
 
 
-// +++++++++++++++++++++++++ PARTIAL WIDTH ++++++++++++++++++++++++++++++
-
-Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp){
-	
-	mpfr_t fermiC, fermiCsq, pi;
-	unsigned int BITS = cfg->getBITS();
-	mpfr_init2(fermiC, BITS);
-	mpfr_init2(fermiCsq, BITS);
-	mpfr_init2(pi, BITS);
-	cfg->getFermiC(fermiC);
-	cfg->getPi(pi);
-	
-	//std::cout << "fermiC: " << mpfr_get_d(fermiC, MPFR_RNDD) << std::endl;
-	
-	/** Get high precision values **/
-	Double_t ml = l.getMass(); 
-	Double_t mh_ = meson.getMass(); Double_t mhp = mesonp.getMass();
-	Double_t mN = N.getMass();
-	Double_t U2_ = N.getAngle();
-	
-	// Compute corresponding V_CKM
-	const Quark_Type Din = meson.getD(); const Quark_Type Dout = mesonp.getD();
-	
-	//Double_t Vud_ = get_VCKM(Din,Dout); 
-	//Double_t Vud_ = cfg->getVUDsq(Din, Dout); 
-	Double_t Vud_ = 1.;
-	//std::cout<<"meson name: " << meson.getName() << std::endl;
-	//std::cout<<"mesonp name: " << mesonp.getName() << std::endl;
-	//std::cout << "VCKM elmt: " << Vud_ << std::endl;
-	
-	mpfr_t yhp, yl, yN, mh, q2, xi, U2, Vud2;
-	// initialisation
-	mpfr_init2(yhp, BITS); 
-	mpfr_init2(yl, BITS); 
-	mpfr_init2(yN, BITS);
-	mpfr_init2(mh, BITS);
-	//mpfr_init2(q2, BITS);
-	//mpfr_init2(xi, BITS);
-	mpfr_init2(U2, BITS);
-	mpfr_init2(Vud2, BITS);
-	
-	// set values
-	mpfr_set_d(yhp, mhp, MPFR_RNDD);
-	mpfr_set_d(yl, ml, MPFR_RNDD);
-	mpfr_set_d(yN, mN, MPFR_RNDD);
-	mpfr_set_d(mh, mh_, MPFR_RNDD);
-	
-	//mpfr_set_d(q2, q2_, MPFR_RNDD);
-	//mpfr_set_d(xi, q2_, MPFR_RNDD);
-	
-	mpfr_set_d(U2, U2_, MPFR_RNDD);
-	mpfr_set_d(Vud2, Vud_, MPFR_RNDD);
-	mpfr_pow_ui(Vud2, Vud2, 2, MPFR_RNDD);
-	
-	/** Compute factor **/
-	mpfr_t factor, tmp;
-	mpfr_init2(factor, BITS);
-	mpfr_init2(tmp, BITS);
-	
-	mpfr_pow_ui(factor, fermiC, 2, MPFR_RNDD);
-	mpfr_pow_ui(tmp, mh, 5, MPFR_RNDD);
-	mpfr_mul(factor, factor, tmp, MPFR_RNDD);
-	mpfr_mul(factor, factor, U2, MPFR_RNDD);
-	mpfr_mul(factor, factor, Vud2, MPFR_RNDD);
-	mpfr_pow_ui(tmp, pi, 3, MPFR_RNDD);
-	mpfr_div(factor, factor, tmp, MPFR_RNDD);
-	mpfr_div_ui(factor, factor, 64, MPFR_RNDD);
-	
-	
-	/** Compute 3 parts of the integral **/
-	
-	Double_t IP_(0);
-	Double_t bmin = pow(ml/mh_ + mN/mh_,2); Double_t bmax = pow(1-(mhp/mh_),2);
-	for(int i(1); i<=3; ++i){
-		IP_ += integral_fP(bmin, bmax, 5000, cfg, N, l, meson, mesonp, i);
-		//std::cout << "INTEGRAL STEP " << i << " : " << IP_ << std::endl;
-	}
-	
-	/** Compute whole PW value **/
-	mpfr_t IP;
-	mpfr_init2(IP, BITS); 
-	mpfr_set_d(IP, IP_, MPFR_RNDD);
-	
-	mpfr_mul(factor, factor, IP, MPFR_RNDD);
-	
-	mpfr_clear(Vud2);
-
-	if(mpfr_get_d(factor, MPFR_RNDD)<0.) return 0.;
-	if(mesonp.getPdgId()==111) return 0.5*mpfr_get_d(factor, MPFR_RNDD);
-	else return mpfr_get_d(factor, MPFR_RNDD);
-	
-}
 
 // +++++++++++++ LEPTONIC CASE +++++++++++++++++++++++++++
 
@@ -696,6 +518,497 @@ Double_t pw_prodFromBmeson_leptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l
 }
 
 // ++++++++++++++++ SEMILEPTONIC VECTOR CASE +++++++++++++++++++++++++++
+
+Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp, Double_t xi_, int part) {
+	
+	/** 
+	 * 1: Vg2	2: Vf2	 3: Va+2	4: Va-2
+	 * 5: Vfa+	6: Vfa-	 7: Va+a-
+	**/
+	
+	unsigned int BITS = cfg->getBITS();
+	
+	// Masses in GeV
+	Double_t ml = l.getMass(); 
+	Double_t mh_ = meson.getMass(); Double_t mhp = mesonp.getMass();
+	Quark_Type U = meson.getU(); Quark_Type D = meson.getD();
+	
+	// Get quarks flavours to apply corresponding V_CKM
+	
+	Double_t mN = N.getMass()*1e-3;
+	Double_t U2 = N.getAngle();
+	
+	Double_t q2_ = xi_ * pow(mh_,2);
+	
+	mpfr_t yhp, yl, yN, mh, q2, xi, prefactor, tmp1, tmp2, res1, res2, res;
+	
+	// initialisation
+	mpfr_init2(yhp, BITS); 
+	mpfr_init2(yl, BITS); 
+	mpfr_init2(yN, BITS);
+	mpfr_init2(mh, BITS);
+	mpfr_init2(q2, BITS);
+	mpfr_init2(xi, BITS);
+	
+	mpfr_init2(prefactor, BITS);
+	mpfr_init2(tmp1, BITS);
+	mpfr_init2(tmp2, BITS);
+	mpfr_init2(res, BITS);
+	mpfr_init2(res1, BITS);
+	mpfr_init2(res2, BITS);
+	
+	
+	// set values
+	mpfr_set_d(yhp, mhp, MPFR_RNDD);
+	mpfr_set_d(yl, ml, MPFR_RNDD);
+	mpfr_set_d(yN, mN, MPFR_RNDD);
+	mpfr_set_d(mh, mh_, MPFR_RNDD);
+	mpfr_set_d(q2, q2_, MPFR_RNDD);
+	mpfr_set_d(xi, xi_, MPFR_RNDD);
+	
+	mpfr_div(yhp, yhp, mh, MPFR_RNDD);
+	mpfr_div(yl, yl, mh, MPFR_RNDD);
+	mpfr_div(yN, yN, mh, MPFR_RNDD);
+	
+	mpfr_t xi2, xi3; 
+	mpfr_init2(xi2, BITS); mpfr_init2(xi3, BITS); 
+	mpfr_pow_ui(xi2, xi, 2, MPFR_RNDD); mpfr_pow_ui(xi3, xi, 3, MPFR_RNDD);
+
+	
+	// Compute form factors for input q2
+	mpfr_t g, g2, f, f2, aplus, aminus, aplus2, aminus2;
+	mpfr_init2(g, BITS); mpfr_init2(g2, BITS);
+	mpfr_init2(f, BITS); mpfr_init2(f2, BITS);
+	mpfr_init2(aplus, BITS); mpfr_init2(aplus2, BITS);
+	mpfr_init2(aminus, BITS); mpfr_init2(aminus2, BITS);
+	
+	
+	mpfr_set_d(g, compute_ffactor(meson, mesonp, q2_, 2), MPFR_RNDD);
+	mpfr_set_d(f, compute_ffactor(meson, mesonp, q2_, 3), MPFR_RNDD);
+	mpfr_set_d(aplus, compute_ffactor(meson, mesonp, q2_, 4), MPFR_RNDD);
+	mpfr_set_d(aminus, compute_ffactor(meson, mesonp, q2_, 5), MPFR_RNDD);
+	
+	mpfr_pow_ui(g2, g, 2, MPFR_RNDD);
+	mpfr_pow_ui(f2, f, 2, MPFR_RNDD);
+	mpfr_pow_ui(aplus2, aplus, 2, MPFR_RNDD);
+	mpfr_pow_ui(aminus2, aminus, 2, MPFR_RNDD);
+			
+			
+	//Compute Lambda term
+	mpfr_t Lambda_;
+	mpfr_init2(Lambda_, BITS); 
+	mpfr_set_d(Lambda_, Lambda(mpfr_get_d(xi, MPFR_RNDD), mpfr_get_d(yhp, MPFR_RNDD), mpfr_get_d(yl, MPFR_RNDD), mpfr_get_d(yN, MPFR_RNDD)), MPFR_RNDD);
+	
+	//Compute Gminus term
+	mpfr_t Gminus_;
+	mpfr_init2(Gminus_, BITS); 
+	mpfr_set_d(Gminus_, Gminus(mpfr_get_d(xi, MPFR_RNDD), mpfr_get_d(yhp, MPFR_RNDD), mpfr_get_d(yl, MPFR_RNDD), mpfr_get_d(yN, MPFR_RNDD)), MPFR_RNDD);
+	
+	//Compute Gplus term
+	mpfr_t Gplus_;
+	mpfr_init2(Gplus_, BITS); 
+	mpfr_set_d(Gplus_, Gplus(mpfr_get_d(xi, MPFR_RNDD), mpfr_get_d(yhp, MPFR_RNDD), mpfr_get_d(yl, MPFR_RNDD), mpfr_get_d(yN, MPFR_RNDD)), MPFR_RNDD);
+	
+	//Compute F term
+	mpfr_t F_;
+	mpfr_init2(F_, BITS); 
+	//std::cout<< "F:" << F(mpfr_get_d(xi, MPFR_RNDD), mpfr_get_d(yhp, MPFR_RNDD)) <<std::endl;
+	mpfr_set_d(F_, F(mpfr_get_d(xi, MPFR_RNDD), mpfr_get_d(yhp, MPFR_RNDD)), MPFR_RNDD);
+			
+	//Compute kallen(1,yhp2,xi) term
+	mpfr_t kallen_;
+	mpfr_init2(kallen_, BITS); 
+	mpfr_set_d(kallen_, kallen(1., pow(mpfr_get_d(yhp, MPFR_RNDD),2), mpfr_get_d(xi, MPFR_RNDD)), MPFR_RNDD);
+	
+	
+	switch(part){
+		case 1:{
+			// Prefactor
+			mpfr_pow_ui(prefactor, mh, 2, MPFR_RNDD);
+			mpfr_pow_ui(tmp1, yhp, 2, MPFR_RNDD);
+			mpfr_mul(prefactor, prefactor, tmp1, MPFR_RNDD);
+			mpfr_div_d(prefactor, prefactor, 3, MPFR_RNDD);
+			//std::cout << "case 1a: " << mpfr_get_d(prefactor, MPFR_RNDD) << std::endl;
+			
+			// Inside integral
+			mpfr_mul_ui(res1, xi2, 2, MPFR_RNDD);
+			mpfr_sub(res1, res1, Gplus_, MPFR_RNDD);
+			//std::cout << "case 1 a: " << mpfr_get_d(res1, MPFR_RNDD) << std::endl;
+			mpfr_mul(res, res1, F_, MPFR_RNDD);
+			//std::cout << "case 1 b: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			//std::cout << "case 1 c: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			mpfr_mul(res, res, g2, MPFR_RNDD);
+			//std::cout << "case 1 d: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			mpfr_div(res, res, xi2, MPFR_RNDD);
+			//std::cout << "case 1 e: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			
+			//std::cout << "case 1: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		
+		case 2:{
+			// Prefactor
+			mpfr_pow_ui(tmp1, mh, 2, MPFR_RNDD);
+			mpfr_ui_div(prefactor, 1, tmp1, MPFR_RNDD);
+			mpfr_div_ui(prefactor, prefactor, 24, MPFR_RNDD);
+			//std::cout << "case 2a: " << mpfr_get_d(prefactor, MPFR_RNDD) << std::endl;
+			// Inside integral
+			mpfr_mul_ui(res1, xi2, 2, MPFR_RNDD);
+			mpfr_sub(res1, res1, Gplus_, MPFR_RNDD);
+			
+			mpfr_pow_ui(res, yhp, 2, MPFR_RNDD);
+			mpfr_mul(res, res, res1, MPFR_RNDD);
+			mpfr_mul_ui(res, res, 12, MPFR_RNDD);
+			mpfr_mul(res, res, xi, MPFR_RNDD);
+			
+			mpfr_pow_ui(res1, Lambda_, 2, MPFR_RNDD);
+			mpfr_sub(res, res, res1, MPFR_RNDD);
+			
+			mpfr_pow_ui(res1, yl, 2, MPFR_RNDD);
+			mpfr_pow_ui(res2, yN, 2, MPFR_RNDD);
+			mpfr_sub(res1, res1, res2, MPFR_RNDD);
+			mpfr_pow_ui(res1, res1, 2, MPFR_RNDD);
+			mpfr_sub(res1, xi2, res1, MPFR_RNDD);
+			mpfr_mul(res1, res1, F_, MPFR_RNDD);
+			mpfr_mul_ui(res1, res1, 3, MPFR_RNDD);
+			
+			mpfr_add(res, res, res1, MPFR_RNDD);
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			mpfr_mul(res, res, f2, MPFR_RNDD);
+			
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			//std::cout << "case 2: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		
+		case 3:{
+			// Prefactor
+			mpfr_pow_ui(prefactor, mh, 2, MPFR_RNDD);
+			mpfr_div_ui(prefactor, prefactor, 24, MPFR_RNDD);
+			//std::cout << "case 3a: " << mpfr_get_d(prefactor, MPFR_RNDD) << std::endl;
+			// Inside integral
+			mpfr_pow_ui(res, yhp, 2, MPFR_RNDD);
+			mpfr_ui_sub(res, 1, res, MPFR_RNDD);
+			mpfr_pow_ui(res, res, 2, MPFR_RNDD);
+			//std::cout << "case 3b: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			mpfr_mul(res, res, Gminus_, MPFR_RNDD);
+			//std::cout << "case 3c: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			mpfr_mul_ui(res, res, 3, MPFR_RNDD);
+			//std::cout << "case 3d: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			
+			mpfr_mul_ui(res1, xi2, 2, MPFR_RNDD);
+			mpfr_sub(res1, res1, Gplus_, MPFR_RNDD);
+			mpfr_mul(res1, res1, F_, MPFR_RNDD);
+			
+			mpfr_add(res, res, res1, MPFR_RNDD);
+			
+			
+			mpfr_mul(res, res, F_, MPFR_RNDD);
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			mpfr_mul(res, res, aplus2, MPFR_RNDD);
+			
+			mpfr_div(res, res, xi3, MPFR_RNDD);
+			
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			
+			//std::cout << "case 3: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		case 4:{
+			// Prefactor
+			mpfr_pow_ui(prefactor, mh, 2, MPFR_RNDD);
+			mpfr_div_d(prefactor, prefactor, 8, MPFR_RNDD);
+			
+			mpfr_mul(res, Gminus_, F_, MPFR_RNDD);
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			mpfr_mul(res, res, aminus2, MPFR_RNDD);
+			mpfr_mul(res, res, f2, MPFR_RNDD);
+			mpfr_div(res, res, xi, MPFR_RNDD);
+			
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			//std::cout << "case 4: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		case 5:{
+			// Prefactor
+			mpfr_set_d(prefactor, 1, MPFR_RNDD);
+			mpfr_div_d(prefactor, prefactor, 12, MPFR_RNDD);
+			
+			mpfr_pow_ui(res1, yl, 2, MPFR_RNDD);
+			mpfr_pow_ui(res2, yN, 2, MPFR_RNDD);
+			mpfr_sub(res1, res1, res2, MPFR_RNDD);
+			mpfr_pow_ui(res1, res1, 2, MPFR_RNDD);
+			
+			mpfr_sub(res1, xi2, res1, MPFR_RNDD);
+			mpfr_mul(res, res1, F_, MPFR_RNDD);
+			mpfr_mul_ui(res, res, 3, MPFR_RNDD);
+			mpfr_pow_ui(res1, Lambda_, 2, MPFR_RNDD);
+			mpfr_sub(res, res, res1, MPFR_RNDD);
+			
+			mpfr_pow_ui(res1, yhp, 2, MPFR_RNDD);
+			mpfr_ui_sub(res1, 1, res1, MPFR_RNDD);
+			mpfr_sub(res1, res1, xi, MPFR_RNDD);
+			
+			mpfr_mul(res, res1, res, MPFR_RNDD);
+			
+			mpfr_mul(res1, Gminus_, F_, MPFR_RNDD);
+			mpfr_mul(res1, res1, xi, MPFR_RNDD);
+			mpfr_mul_ui(res1, res1, 3, MPFR_RNDD);
+			
+			mpfr_add(res, res, res1, MPFR_RNDD);
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			mpfr_mul(res, res, aplus, MPFR_RNDD);
+			mpfr_mul(res, res, f, MPFR_RNDD);
+			
+			mpfr_div(res, res, xi3, MPFR_RNDD);
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			
+			//std::cout << "case 5: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		case 6:{
+			// Prefactor
+			mpfr_set_d(prefactor, 1, MPFR_RNDD);
+			mpfr_div_d(prefactor, prefactor, 4, MPFR_RNDD);
+			
+			//Inside integral
+			mpfr_mul(res, Gminus_, F_, MPFR_RNDD);
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			mpfr_mul(res, res, aminus, MPFR_RNDD);
+			mpfr_mul(res, res, f, MPFR_RNDD);
+			mpfr_div(res, res, xi2, MPFR_RNDD);
+			
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			//std::cout << "case 6: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		case 7:{
+			// Prefactor
+			mpfr_pow_ui(prefactor, mh, 2, MPFR_RNDD);
+			mpfr_div_d(prefactor, prefactor, 4, MPFR_RNDD);
+			
+			mpfr_pow_ui(res, yhp, 2, MPFR_RNDD);
+			mpfr_ui_sub(res, 1, yhp, MPFR_RNDD);
+			mpfr_mul(res, res, Gminus_, MPFR_RNDD);
+			mpfr_mul(res, res, F_, MPFR_RNDD);
+			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
+			mpfr_mul(res, res, aminus, MPFR_RNDD);
+			mpfr_mul(res, res, aplus, MPFR_RNDD);
+			mpfr_div(res, res, xi2, MPFR_RNDD);
+			
+			mpfr_mul(res, res, prefactor, MPFR_RNDD);
+			
+			//std::cout << "case 7: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			
+			return mpfr_get_d(res, MPFR_RNDD);
+			break;
+		}
+		
+		default:
+		{
+			 std::cerr<<"Error: fV 'part' argument must be between 1 and 7" << std::endl; break;
+		}
+	}
+	
+	return 0.;
+}
+
+Double_t compute_integral(Double_t a, Double_t b, Double_t nsteps, std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp){
+	Double_t step = (b-a)/nsteps;
+	unsigned int BITS = cfg->getBITS();
+	//vector<Double_t> fV_vec;
+	Double_t xi1, xi2, xi3;
+	Double_t fstep_, fV_xi1(0), fV_xi2(0), fV_xi3(0);
+	mpfr_t res; 
+	mpfr_init2(res, BITS); mpfr_set_d(res, 0, MPFR_RNDD); 
+	mpfr_t fstep;
+	mpfr_init2(fstep, BITS); 
+	for(int i(0); i<nsteps; ++i){
+		xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+		xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+		xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+		
+		fV_xi1=0; fV_xi2=0; fV_xi3=0;
+		fstep_=0;
+		
+		for(size_t j(1); j<=7; ++j){
+			fV_xi1 = fV_xi1 + compute_fV(cfg, N, l, meson, mesonp, xi1, j);
+			fV_xi2 = fV_xi2 + compute_fV(cfg, N, l, meson, mesonp, xi2, j);
+			fV_xi3 = fV_xi3 + compute_fV(cfg, N, l, meson, mesonp, xi3, j);
+			
+		}
+		fstep_ += step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+		
+		//std::cout << "fstep_" << fstep_ << std::endl;
+		
+		mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+		
+		mpfr_add(res, res, fstep, MPFR_RNDD);
+		
+		
+	}
+	//std::cout << "res" << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+	
+	return mpfr_get_d(res, MPFR_RNDD);
+	//return 0;
+}
+
+Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp){
+	
+	//std::cout << "0: pw_prodFromBmeson_semileptonic" << std::endl;
+	
+	bool process; // 0:pseudoscalar, 1:vector
+	
+	mpfr_t fermiC, fermiCsq, pi;
+	unsigned int BITS = cfg->getBITS();
+	mpfr_init2(fermiC, BITS);
+	mpfr_init2(fermiCsq, BITS);
+	mpfr_init2(pi, BITS);
+	cfg->getFermiC(fermiC);
+	cfg->getPi(pi);
+	
+	//std::cout << "1: pw_prodFromBmeson_semileptonic" << std::endl;
+	//std::cout << "fermiC: " << mpfr_get_d(fermiC, MPFR_RNDD) << std::endl;
+	
+	/** Get high precision values **/
+	Double_t ml = l.getMass(); 
+	Double_t mh_ = meson.getMass(); Double_t mhp_ = mesonp.getMass();
+	Double_t mN = N.getMass();
+	Double_t U2_ = N.getAngle();
+	
+	// Compute corresponding V_CKM
+	const Quark_Type Din = meson.getD(); const Quark_Type Dout = mesonp.getD();
+	//std::cout << "2: pw_prodFromBmeson_semileptonic" << std::endl;
+	//Double_t Vud_ = get_VCKM(Din,Dout); 
+	//Double_t Vud_ = cfg->getVUDsq(Din, Dout); 
+	Double_t Vud_ = 1.;
+	//std::cout<<"meson name: " << meson.getName() << std::endl;
+	//std::cout<<"mesonp name: " << mesonp.getName() << std::endl;
+	//std::cout << "VCKM elmt: " << Vud_ << std::endl;
+	
+	mpfr_t yhp, yl, yN, mh, mhp, q2, xi, U2, Vud2;
+	// initialisation
+	
+	mpfr_init2(yhp, BITS); 
+	mpfr_init2(yl, BITS); 
+	mpfr_init2(yN, BITS);
+	mpfr_init2(mh, BITS);
+	mpfr_init2(mhp, BITS);
+	mpfr_init2(U2, BITS);
+	mpfr_init2(Vud2, BITS);
+	
+	// set values
+	mpfr_set_d(yhp, mhp_, MPFR_RNDD);
+	mpfr_set_d(yl, ml, MPFR_RNDD);
+	mpfr_set_d(yN, mN, MPFR_RNDD);
+	mpfr_set_d(mh, mh_, MPFR_RNDD);
+	mpfr_set_d(mhp, mhp_, MPFR_RNDD);
+	
+	//std::cout << "fermiC: " << mpfr_get_d(fermiC, MPFR_RNDD) << std::endl;
+	//std::cout << "mh: " << mpfr_get_d(mh, MPFR_RNDD) << std::endl;
+	//std::cout << "mhp: " << mpfr_get_d(mhp, MPFR_RNDD) << std::endl;
+	
+	//mpfr_set_d(q2, q2_, MPFR_RNDD);
+	//mpfr_set_d(xi, q2_, MPFR_RNDD);
+		
+	mpfr_set_d(U2, U2_, MPFR_RNDD);
+	mpfr_set_d(Vud2, Vud_, MPFR_RNDD);
+	mpfr_pow_ui(Vud2, Vud2, 2, MPFR_RNDD);
+		
+	/** Compute factor **/
+	mpfr_t factor, tmp;
+	mpfr_init2(factor, BITS);
+	mpfr_init2(tmp, BITS);
+	
+	// PSEUDOSCALAR
+	if(mesonp.getMesonType()==MesonType::pseudoscalar){
+	//if(1){	
+		//std::cout << "MesonType::pseudoscalar" << std::endl;
+		
+		mpfr_pow_ui(factor, fermiC, 2, MPFR_RNDD);
+		mpfr_pow_ui(tmp, mh, 5, MPFR_RNDD);
+		mpfr_mul(factor, factor, tmp, MPFR_RNDD);
+		mpfr_mul(factor, factor, U2, MPFR_RNDD);
+		mpfr_mul(factor, factor, Vud2, MPFR_RNDD);
+		mpfr_pow_ui(tmp, pi, 3, MPFR_RNDD);
+		mpfr_div(factor, factor, tmp, MPFR_RNDD);
+		mpfr_div_ui(factor, factor, 64, MPFR_RNDD);
+			
+		/** Compute 3 parts of the integral **/
+		
+		Double_t IP_(0);
+		Double_t bmin = pow(ml/mh_ + mN/mh_,2); Double_t bmax = pow(1-(mhp_/mh_),2);
+		for(int i(1); i<=3; ++i){
+			IP_ += integral_fP(bmin, bmax, 5000, cfg, N, l, meson, mesonp, i);
+			//std::cout << "INTEGRAL STEP " << i << " : " << IP_ << std::endl;
+		}
+		
+		/** Compute whole PW value **/
+		mpfr_t IP;
+		mpfr_init2(IP, BITS); 
+		mpfr_set_d(IP, IP_, MPFR_RNDD);
+		
+		mpfr_mul(factor, factor, IP, MPFR_RNDD);
+		
+		mpfr_clear(Vud2);
+
+		if(mpfr_get_d(factor, MPFR_RNDD)<0.) return 0.;
+		if(mesonp.getPdgId()==111) return 0.5*mpfr_get_d(factor, MPFR_RNDD);
+		else return mpfr_get_d(factor, MPFR_RNDD);
+	}
+	
+	// VECTOR
+	else if(mesonp.getMesonType()==MesonType::vector){
+	
+		//std::cout<<"vector" << std::endl;
+		mpfr_pow_ui(factor, fermiC, 2, MPFR_RNDD);
+		mpfr_pow_ui(tmp, mh, 7, MPFR_RNDD);
+		mpfr_mul(factor, factor, tmp, MPFR_RNDD);
+		mpfr_mul(factor, factor, U2, MPFR_RNDD);
+		mpfr_mul(factor, factor, Vud2, MPFR_RNDD);
+		mpfr_pow_ui(tmp, pi, 3, MPFR_RNDD);
+		mpfr_div(factor, factor, tmp, MPFR_RNDD);
+		mpfr_div_ui(factor, factor, 64, MPFR_RNDD);
+		mpfr_pow_ui(tmp, mhp, 2, MPFR_RNDD);
+		mpfr_mul(factor, factor, tmp, MPFR_RNDD);
+		//std::cout << "factor" << mpfr_get_d(factor, MPFR_RNDD) << std::endl;
+		/** Compute 3 parts of the integral **/
+		
+		Double_t IP_(0);
+		Double_t bmin = pow(ml/mh_ + mN/mh_,2); Double_t bmax = pow(1-(mhp_/mh_),2);
+		
+		IP_ = compute_integral(bmin, bmax, 5000, cfg, N, l, meson, mesonp);
+		
+		//std::cout << "IP_: " << IP_ << std::endl;
+		//IP_=1.;
+		
+		/** Compute whole PW value **/
+		mpfr_t IP;
+		mpfr_init2(IP, BITS); 
+		mpfr_set_d(IP, IP_, MPFR_RNDD);
+		//std::cout << "IP" << mpfr_get_d(IP, MPFR_RNDD) << std::endl;
+		
+		mpfr_mul(factor, factor, IP, MPFR_RNDD);
+		
+		mpfr_clear(Vud2);
+
+		if(mpfr_get_d(factor, MPFR_RNDD)<0.) return 0.;
+		if(mesonp.getPdgId()==213) return sqrt(0.5)*mpfr_get_d(factor, MPFR_RNDD);
+		else return mpfr_get_d(factor, MPFR_RNDD);
+	}
+	
+	else std::cerr<<"ERROR: MesonType not recognized (pseudosclar or vector)";
+	return 1.;
+	
+}
 
 
 // +++++++++++++ DISPLAY +++++++++++++++++++++++++++
