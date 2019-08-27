@@ -535,7 +535,7 @@ Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, M
 	
 	// Get quarks flavours to apply corresponding V_CKM
 	
-	Double_t mN = N.getMass()*1e-3;
+	Double_t mN = N.getMass();//*1e-3;
 	Double_t U2 = N.getAngle();
 	
 	Double_t q2_ = xi_ * pow(mh_,2);
@@ -573,7 +573,7 @@ Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, M
 	mpfr_t xi2, xi3; 
 	mpfr_init2(xi2, BITS); mpfr_init2(xi3, BITS); 
 	mpfr_pow_ui(xi2, xi, 2, MPFR_RNDD); mpfr_pow_ui(xi3, xi, 3, MPFR_RNDD);
-
+	//std::cout<<"xi3"<<mpfr_get_d(xi3, MPFR_RNDD)<<std::endl;
 	
 	// Compute form factors for input q2
 	mpfr_t g, g2, f, f2, aplus, aminus, aplus2, aminus2;
@@ -644,7 +644,7 @@ Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, M
 			//std::cout << "case 1 e: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
 			mpfr_mul(res, res, prefactor, MPFR_RNDD);
 			
-			//std::cout << "case 1: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+			///\std::cout << "case 1: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
 			return mpfr_get_d(res, MPFR_RNDD);
 			break;
 		}
@@ -678,6 +678,8 @@ Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, M
 			mpfr_add(res, res, res1, MPFR_RNDD);
 			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
 			mpfr_mul(res, res, f2, MPFR_RNDD);
+			
+			mpfr_div(res, res, xi3, MPFR_RNDD);
 			
 			mpfr_mul(res, res, prefactor, MPFR_RNDD);
 			//std::cout << "case 2: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
@@ -725,9 +727,10 @@ Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, M
 			mpfr_div_d(prefactor, prefactor, 8, MPFR_RNDD);
 			
 			mpfr_mul(res, Gminus_, F_, MPFR_RNDD);
+			//std::cout << "case 4a: " << mpfr_get_d(res, MPFR_RNDD) << std::endl;
 			mpfr_mul(res, res, Lambda_, MPFR_RNDD);
 			mpfr_mul(res, res, aminus2, MPFR_RNDD);
-			mpfr_mul(res, res, f2, MPFR_RNDD);
+			//mpfr_mul(res, res, f2, MPFR_RNDD);
 			mpfr_div(res, res, xi, MPFR_RNDD);
 			
 			mpfr_mul(res, res, prefactor, MPFR_RNDD);
@@ -822,7 +825,62 @@ Double_t compute_fV(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, M
 }
 
 Double_t compute_integral(Double_t a, Double_t b, Double_t nsteps, std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp){
-	Double_t step = (b-a)/nsteps;
+	if(b<a) return 0;
+	else{
+		Double_t step = (b-a)/nsteps;
+		unsigned int BITS = cfg->getBITS();
+		//vector<Double_t> fV_vec;
+		Double_t xi1, xi2, xi3;
+		Double_t fstep_, fV_xi1(0), fV_xi2(0), fV_xi3(0);
+		mpfr_t res; 
+		mpfr_init2(res, BITS); mpfr_set_d(res, 0, MPFR_RNDD); 
+		mpfr_t fstep;
+		mpfr_init2(fstep, BITS); 
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			for(size_t j(1); j<=7; ++j){
+				fV_xi1 = fV_xi1 + compute_fV(cfg, N, l, meson, mesonp, xi1, j);
+				//std::cout<<"fV_xi1, step " << j << ": " << fV_xi1 << std::endl;
+				
+				fV_xi2 = fV_xi2 + compute_fV(cfg, N, l, meson, mesonp, xi2, j);
+				fV_xi3 = fV_xi3 + compute_fV(cfg, N, l, meson, mesonp, xi3, j);	
+			}
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			//std::cout << "fstep_" << fstep_ << std::endl;
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+			
+			
+		}
+		//std::cout << "res" << mpfr_get_d(res, MPFR_RNDD) << std::endl;
+		
+		return mpfr_get_d(res, MPFR_RNDD);
+		//return 0;
+	}
+}
+
+void MONITORING(Double_t nsteps, std::shared_ptr<Config> cfg, Lepton l, Meson meson, Meson mesonp){
+	std::vector<double> mNvec = {0.,0.244, 0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25,  3.50, 3.75, 4.00, 4.25, 4.50, 4.75, 5.00, 5.25, 5.50, 5.75, 6.00,6.25,6.5};
+
+	Double_t ml = l.getMass(); 
+	Double_t mh_ = meson.getMass(); Double_t mhp_ = mesonp.getMass();
+	
+		
+
+	TString s = std::to_string(meson.getPdgId())+"_to_"+std::to_string(mesonp.getPdgId())+"_muN";
+	std::ofstream ofile; 	ofile.open("../dat_files/integral_parts_"+s+".dat");
+
+	Double_t step;
+	
 	unsigned int BITS = cfg->getBITS();
 	//vector<Double_t> fV_vec;
 	Double_t xi1, xi2, xi3;
@@ -831,35 +889,237 @@ Double_t compute_integral(Double_t a, Double_t b, Double_t nsteps, std::shared_p
 	mpfr_init2(res, BITS); mpfr_set_d(res, 0, MPFR_RNDD); 
 	mpfr_t fstep;
 	mpfr_init2(fstep, BITS); 
-	for(int i(0); i<nsteps; ++i){
-		xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
-		xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
-		xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
-		
-		fV_xi1=0; fV_xi2=0; fV_xi3=0;
-		fstep_=0;
-		
-		for(size_t j(1); j<=7; ++j){
-			fV_xi1 = fV_xi1 + compute_fV(cfg, N, l, meson, mesonp, xi1, j);
-			fV_xi2 = fV_xi2 + compute_fV(cfg, N, l, meson, mesonp, xi2, j);
-			fV_xi3 = fV_xi3 + compute_fV(cfg, N, l, meson, mesonp, xi3, j);
-			
-		}
-		fstep_ += step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
-		
-		//std::cout << "fstep_" << fstep_ << std::endl;
-		
-		mpfr_set_d(fstep, fstep_, MPFR_RNDD);
-		
-		mpfr_add(res, res, fstep, MPFR_RNDD);
-		
-		
-	}
-	//std::cout << "res" << mpfr_get_d(res, MPFR_RNDD) << std::endl;
 	
-	return mpfr_get_d(res, MPFR_RNDD);
-	//return 0;
+	Double_t mN;
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		ofile << mN<<" ";
+	}
+	ofile << std::endl;
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		
+		if(step < 0) ofile << 0.0 <<" ";
+		
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 1);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 1);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 1);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		if(step < 0) ofile << 0.0 <<" ";
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 2);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 2);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 2);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		if(step < 0) ofile << 0.0 <<" ";
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 3);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 3);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 3);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		if(step < 0) ofile << 0.0 <<" ";
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 4);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 4);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 4);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		if(step < 0) ofile << 0.0 <<" ";
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 5);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 5);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 5);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		if(step < 0) ofile << 0.0 <<" ";
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 6);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 6);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 6);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	for (int k(0); k<mNvec.size(); k++){
+		mN = mNvec[k]*1e3;
+		std::vector<Lepton> mixes_with; mixes_with={l};
+		HNL N = HNL("HNL", mN, 1e-6, mixes_with);
+		
+		Double_t a = pow(ml/mh_ + mN/mh_,2); Double_t b = pow(1-(mhp_/mh_),2);
+		step = (b-a)/nsteps;
+		if(step < 0) ofile << 0.0 <<" ";
+		else{
+		for(int i(0); i<nsteps; ++i){
+			xi1 = a+i*step; //std::cout << "xi1" << xi1 << std::endl;
+			xi2 = a+(i+0.5)*step; //std::cout << "xi2" << xi2 << std::endl;
+			xi3 = a+(i+1.)*step; //std::cout << "xi3" << xi3 << std::endl;
+			
+			fV_xi1=0; fV_xi2=0; fV_xi3=0;
+			fstep_=0;
+			
+			fV_xi1 = compute_fV(cfg, N, l, meson, mesonp, xi1, 7);
+			fV_xi2 = compute_fV(cfg, N, l, meson, mesonp, xi2, 7);
+			fV_xi3 = compute_fV(cfg, N, l, meson, mesonp, xi3, 7);
+			
+			fstep_ = step*(1./6.*fV_xi1 + 4./6.*fV_xi2 + 1./6.*fV_xi3);
+			
+			mpfr_set_d(fstep, fstep_, MPFR_RNDD);
+			mpfr_add(res, res, fstep, MPFR_RNDD);
+		}
+		ofile << mpfr_get_d(res, MPFR_RNDD)<<" ";
+	}
+	}
+	ofile << std::endl;
+	
+	return;
 }
+
+
+
 
 Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp){
 	
@@ -906,11 +1166,13 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 	mpfr_init2(Vud2, BITS);
 	
 	// set values
-	mpfr_set_d(yhp, mhp_, MPFR_RNDD);
-	mpfr_set_d(yl, ml, MPFR_RNDD);
-	mpfr_set_d(yN, mN, MPFR_RNDD);
+	
 	mpfr_set_d(mh, mh_, MPFR_RNDD);
 	mpfr_set_d(mhp, mhp_, MPFR_RNDD);
+	
+	mpfr_d_div(yl, ml, mh, MPFR_RNDD);
+	mpfr_d_div(yhp, mhp_, mh, MPFR_RNDD);
+	mpfr_d_div(yN, mN, mh, MPFR_RNDD);
 	
 	//std::cout << "fermiC: " << mpfr_get_d(fermiC, MPFR_RNDD) << std::endl;
 	//std::cout << "mh: " << mpfr_get_d(mh, MPFR_RNDD) << std::endl;
@@ -970,6 +1232,7 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 	
 		//std::cout<<"vector" << std::endl;
 		mpfr_pow_ui(factor, fermiC, 2, MPFR_RNDD);
+		//std::cout<<"fermic2" << mpfr_get_d(factor, MPFR_RNDD) << std::endl;
 		mpfr_pow_ui(tmp, mh, 7, MPFR_RNDD);
 		mpfr_mul(factor, factor, tmp, MPFR_RNDD);
 		mpfr_mul(factor, factor, U2, MPFR_RNDD);
@@ -978,14 +1241,14 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 		mpfr_div(factor, factor, tmp, MPFR_RNDD);
 		mpfr_div_ui(factor, factor, 64, MPFR_RNDD);
 		mpfr_pow_ui(tmp, mhp, 2, MPFR_RNDD);
-		mpfr_mul(factor, factor, tmp, MPFR_RNDD);
+		mpfr_div(factor, factor, tmp, MPFR_RNDD);
 		//std::cout << "factor" << mpfr_get_d(factor, MPFR_RNDD) << std::endl;
 		/** Compute 3 parts of the integral **/
 		
 		Double_t IP_(0);
 		Double_t bmin = pow(ml/mh_ + mN/mh_,2); Double_t bmax = pow(1-(mhp_/mh_),2);
 		
-		IP_ = compute_integral(bmin, bmax, 5000, cfg, N, l, meson, mesonp);
+		IP_ = compute_integral(bmin, bmax, 500, cfg, N, l, meson, mesonp);
 		
 		//std::cout << "IP_: " << IP_ << std::endl;
 		//IP_=1.;
@@ -998,15 +1261,15 @@ Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lept
 		
 		mpfr_mul(factor, factor, IP, MPFR_RNDD);
 		
-		mpfr_clear(Vud2);
+		mpfr_clears(fermiC, pi, Vud2, IP, yl, yN, yhp, mh, mhp, (mpfr_ptr)0);
 
 		if(mpfr_get_d(factor, MPFR_RNDD)<0.) return 0.;
 		if(mesonp.getPdgId()==213) return sqrt(0.5)*mpfr_get_d(factor, MPFR_RNDD);
-		else return mpfr_get_d(factor, MPFR_RNDD);
+		else return mpfr_get_d(factor, MPFR_RNDD);//*1.e-12;
 	}
 	
 	else std::cerr<<"ERROR: MesonType not recognized (pseudosclar or vector)";
-	return 1.;
+	return 0.;
 	
 }
 
@@ -1035,17 +1298,42 @@ void display_fform(HNL N, Lepton l, Meson meson, Meson mesonp){
 		ofile << q2<<" ";
 	}
 	ofile << std::endl;
+	// fplus
 	for(int i(0); i<nsteps; i++){
 		q2 = pow(mh,2)*(a+step*i);
 		ofile << compute_ffactor(meson,mesonp,q2,1)<<" ";
 	}
 	ofile << std::endl;
+	// fzero
 	for(int i(0); i<nsteps; i++){
 		q2 = pow(mh,2)*(a+step*i);
 		ofile << compute_ffactor(meson,mesonp,q2,0)<<" ";
 	}
 	ofile << std::endl;
-	
+	// g
+	for(int i(0); i<nsteps; i++){
+		q2 = pow(mh,2)*(a+step*i);
+		ofile << compute_ffactor(meson,mesonp,q2,0)<<" ";
+	}
+	ofile << std::endl;
+	// f
+	for(int i(0); i<nsteps; i++){
+		q2 = pow(mh,2)*(a+step*i);
+		ofile << compute_ffactor(meson,mesonp,q2,0)<<" ";
+	}
+	ofile << std::endl;
+	// aplus
+	for(int i(0); i<nsteps; i++){
+		q2 = pow(mh,2)*(a+step*i);
+		ofile << compute_ffactor(meson,mesonp,q2,0)<<" ";
+	}
+	ofile << std::endl;
+	// aminus
+	for(int i(0); i<nsteps; i++){
+		q2 = pow(mh,2)*(a+step*i);
+		ofile << compute_ffactor(meson,mesonp,q2,0)<<" ";
+	}
+	ofile << std::endl;
 	
 	
 	return;

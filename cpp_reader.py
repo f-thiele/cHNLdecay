@@ -57,6 +57,9 @@ def plot_prod_BR():
 	BR13 = [];
 	BR21 = [];
 	BR22 = [];
+	BR23 = [];
+	BR31 = [];
+	BR32 = [];
 	M = (0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6)
 	# Fixed lifetime 1ns
 	lifetime=50 #1ns
@@ -66,6 +69,9 @@ def plot_prod_BR():
 		BR13.append(get_prod_BR(m, lifetime, 521, 113, 13))
 		BR21.append(get_prod_BR(m, lifetime, 521, 0, 13))
 		BR22.append(get_prod_BR(m, lifetime, 521, 111, 13))
+		BR23.append(get_prod_BR(m, lifetime, 521, 423, 13))
+		BR31.append(get_prod_BR(m, lifetime, 531, 323, 13))
+		BR32.append(get_prod_BR(m, lifetime, 531, 433, 13))
 		
 		
 		#np.append(BR3, 0.5, get_prod_BR(m, 1, 511, 0, 13))
@@ -80,6 +86,9 @@ def plot_prod_BR():
 	plt.plot(M, BR13, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^0 \rightarrow rho^- \mu^+ N$')
 	plt.plot(M, BR21, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'$B^+ \rightarrow \mu^+ N$')
 	plt.plot(M, BR22, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$B^+ \rightarrow \pi^0 \mu^+ N$')
+	plt.plot(M, BR23, color='seagreen', linestyle = 'dashed',linewidth = 0.8,label=r'$B^+ \rightarrow D^* \mu^+ N$')
+	plt.plot(M, BR31, color='mediumblue', linestyle = 'dashed',linewidth = 0.8,label=r'$B_s^+ \rightarrow D_s^* \mu^+ N$')
+	plt.plot(M, BR32, color='slateblue', linestyle = 'dashed',linewidth = 0.8,label=r'$B_s^+ \rightarrow K^* \mu^+ N$')
 	plt.legend()
 	plt.savefig('prod_BRs_check.pdf');
 

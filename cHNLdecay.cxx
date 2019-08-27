@@ -213,8 +213,6 @@ int main(int argc, char **argv) {
       abort();
     }
   }
-  
-  
 	if(mainmode==0){
 
 	  /* Print any remaining command line arguments (not options). */
@@ -236,7 +234,6 @@ int main(int argc, char **argv) {
 	  Double_t Gamma = N.getTotalWidth(cfg, all_leptons, mesons);
 	  LOG_INFO("mass=" << N.getMass() / 1000. << " GeV, "
 					   << "ctau=" << gamma2ctau(cfg, Gamma) << " mm");
-
 
 	  Quark down = Quark(1, 4.8, Quark_Type::down);
 	  Quark up = Quark(2, 2.3, Quark_Type::up);
