@@ -402,6 +402,10 @@ int main(int argc, char **argv) {
 	//std::cout<<"test " << test << std::endl;
 	//std::cout<<"test2 " << test2 << std::endl;
 	//std::cout<<"kal " << kal << std::endl;
+	
+	else if(mainmode==4) std::cout<<tau0_to_U2(HNLmass, tau0);
+		
+	
 	return EXIT_SUCCESS;
 }
 
