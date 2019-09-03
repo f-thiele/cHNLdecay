@@ -26,5 +26,9 @@ Double_t MONITORING(Double_t nsteps, std::shared_ptr<Config>, Lepton, Meson, Mes
 Double_t pw_prodFromBmeson_semileptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson, Meson mesonp);
 Double_t pw_prodFromBmeson_leptonic(std::shared_ptr<Config> cfg, HNL N, Lepton l, Meson meson);
 
+Double_t compute_dint_Lambdab_proton(std::shared_ptr<Config> cfg, HNL N, Lepton l, Double_t mh, Double_t mhp, Double_t q2);
+Double_t compute_dint_Lambdab_Lambdac(std::shared_ptr<Config> cfg, HNL N, Lepton l, Double_t mh, Double_t mhp, Double_t q2);
+
+
 void display_fform(HNL N, Lepton l, Meson meson, Meson mesonp);
 #endif

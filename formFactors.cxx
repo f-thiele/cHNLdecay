@@ -400,7 +400,7 @@ Double_t compute_ffactor(Meson h, Meson hp, Double_t q2, int opt) {
 			//std::cout<<"aminus:"<<compute_FF_aminus(h, hp, q2)<<std::endl;
 			return compute_FF_aminus(h, hp, q2);
 			break;
-
+	
 	}
 	
 	
@@ -417,3 +417,286 @@ Double_t compute_ffactor(Meson h, Meson hp, Double_t q2, int opt) {
 	
 	return factor*sum;
 }
+
+// Form factors hyperons
+
+std::vector<Double_t> acoeffs_Lambdab_proton() // table X of [1503.01421]
+{
+	return { 0.42512661779076, -0.70879824786202, 0.89250038017833, 
+			 0.41441295090913, -1.041709976979, 1.9259425862863, 
+			 0.52144673308125, -0.82467696338466, 0.76090923603286,
+			 0.38886025531083,  -1.0725956052846, 1.9857217253182,
+			 0.44189326677855,  -0.86494888515889, 0.99692910373979,
+			 0.38886025531083, -1.0839467598681, 1.4521580817004 };
+
+	/* { a0_fplus, 	a1_fplus,	a2_fplus  
+		 a0_f0,		a1_f0, 		a2_f0  
+		 a0_fperp,  a1_fperp, 	a2_fperp 
+		 a1_gplus,	a2_gplus 
+		a0_g0, 		a1_g0, 		a2_g0 
+		a1_gperp, a2_gperp
+
+* */
+}
+
+
+std::vector<Double_t> acoeffs_Lambdab_Lambdac() // table X of [1503.01421]
+{
+	return { 0.42512661779076, -0.70879824786202, 0.89250038017833, 
+			 0.41441295090913, -1.041709976979, 1.9259425862863, 
+			 0.52144673308125, -0.82467696338466, 0.76090923603286,
+			 0.38886025531083,  -1.0725956052846, 1.9857217253182,
+			 0.44189326677855,  -0.86494888515889, 0.99692910373979,
+			 0.38886025531083, -1.0839467598681, 1.4521580817004 };
+}
+
+std::vector<Double_t> Mpole_Lambdab_proton(){
+	return{ 1., 1., 1., 1., 1., 1.};	
+	// fplus, f0, fperp, gplus, g0, gplus
+}
+std::vector<Double_t> Mpole_Lambdab_Lambdac(){
+	return{ 1., 1., 1., 1., 1., 1.};	
+	// fplus, f0, fperp, gplus, g0, gplus
+}
+std::vector<Double_t> tplus_Lambdab_proton(){
+	return{ 1., 1., 1., 1., 1., 1.};
+	// fplus, f0, fperp, gplus, g0, gplus
+}
+std::vector<Double_t> tplus_Lambdab_Lambdac(){
+	return{ 1., 1., 1., 1., 1., 1.};
+	// fplus, f0, fperp, gplus, g0, gplus
+}
+
+std::vector<Double_t> z_Lambdab_proton(){
+	return{ 1., 1., 1., 1., 1., 1.};
+	// fplus, f0, fperp, gplus, g0, gplus
+}
+std::vector<Double_t> z_Lambdab_Lambdac(){
+	return{ 1., 1., 1., 1., 1., 1.};
+	// fplus, f0, fperp, gplus, g0, gplus
+}
+
+
+//// eq. (81)
+
+Double_t f_Lambdab_proton(Double_t q2, int idx){
+	
+	Double_t Mpole, mh, mhp, a0, a1, a2, z, tplus, t0, factor, sum;
+	
+	
+	mh = 5.;
+	mhp = 1.;
+	
+	
+	
+	t0		= pow(mh - mhp, 2); 
+	tplus 	= tplus_Lambdab_proton()[idx];
+	Mpole 	= Mpole_Lambdab_proton()[idx];
+	z 		= z_Lambdab_proton()[idx];
+	
+	a0		= acoeffs_Lambdab_proton()[idx*3];
+	a1		= acoeffs_Lambdab_proton()[idx*3+1];
+	a2		= acoeffs_Lambdab_proton()[idx*3+2];
+	
+	factor = 1/(1-q2/pow(Mpole, 2));
+	
+	
+	
+	sum  = a0;
+	sum += a1*z;
+	sum += a2*pow(z,2);
+	
+	
+	return factor*sum;
+}
+
+Double_t f_Lambdab_Lambdac(Double_t q2, int idx){
+	
+	Double_t Mpole, mh, mhp, a0, a1, a2, z, tplus, t0, factor, sum;
+	
+	
+	mh = 5.;
+	mhp = 1.;
+	
+	
+	
+	t0		= pow(mh - mhp, 2); 
+	tplus 	= tplus_Lambdab_Lambdac()[idx];
+	Mpole 	= Mpole_Lambdab_Lambdac()[idx];
+	z 		= z_Lambdab_Lambdac()[idx];
+	
+	a0		= acoeffs_Lambdab_Lambdac()[idx*3];
+	a1		= acoeffs_Lambdab_Lambdac()[idx*3+1];
+	a2		= acoeffs_Lambdab_Lambdac()[idx*3+2];
+	
+	factor = 1/(1-q2/pow(Mpole, 2));
+	
+	
+	
+	sum  = a0;
+	sum += a1*z;
+	sum += a2*pow(z,2);
+	
+	
+	return factor*sum;
+}
+
+////
+
+
+Double_t f2V_Lambdab_proton(Double_t q2){ 
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	return (mh*(mh+mhp))/(q2-pow(mh+mhp,2)) * (f_Lambdab_proton(q2,0)-f_Lambdab_proton(q2,2));
+}
+Double_t f1V_Lambdab_proton(Double_t q2){ 
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return f_Lambdab_proton(q2,0) - (q2/(mh*(mh+mhp)))*f2V_Lambdab_proton(q2);
+}
+Double_t f3V_Lambdab_proton(Double_t q2){ 
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return (f_Lambdab_proton(q2,1) - f1V_Lambdab_proton(q2))*(mh*(mh+mhp))/q2; 
+}
+
+Double_t f2A_Lambdab_proton(Double_t q2){ 
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	return (mh*(mh-mhp))/(-q2+pow(mh-mhp,2)) * (f_Lambdab_proton(q2,3)-f_Lambdab_proton(q2,5));
+}
+Double_t f1A_Lambdab_proton(Double_t q2){ 
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return f_Lambdab_proton(q2,0) - (-q2/(mh*(mh-mhp)))*f2A_Lambdab_proton(q2);
+}
+Double_t f3A_Lambdab_proton(Double_t q2){ 
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return (f_Lambdab_proton(q2,4) - f1V_Lambdab_proton(q2))*(mh*(mh-mhp))/(-q2); 
+}
+
+
+
+Double_t f2V_Lambdab_Lambdac(Double_t q2){ // true = V, false = A
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	return (mh*(mh+mhp))/(q2-pow(mh+mhp,2)) * (f_Lambdab_Lambdac(q2,0)-f_Lambdab_Lambdac(q2,2));
+}
+Double_t f1V_Lambdab_Lambdac(Double_t q2){ // true = V, false = A
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return f_Lambdab_Lambdac(q2,0) - (q2/(mh*(mh+mhp)))*f2V_Lambdab_Lambdac(q2);
+}
+Double_t f3V_Lambdab_Lambdac(Double_t q2){ // true = V, false = A
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return (f_Lambdab_Lambdac(q2,1) - f1V_Lambdab_Lambdac(q2))*(mh*(mh+mhp))/q2; 
+}
+Double_t f2A_Lambdab_Lambdac(Double_t q2){ 
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	return (mh*(mh-mhp))/(-q2+pow(mh-mhp,2)) * (f_Lambdab_Lambdac(q2,3)-f_Lambdab_Lambdac(q2,5));
+}
+Double_t f1A_Lambdab_Lambdac(Double_t q2){ 
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return f_Lambdab_Lambdac(q2,0) - (-q2/(mh*(mh-mhp)))*f2A_Lambdab_Lambdac(q2);
+}
+Double_t f3A_Lambdab_Lambdac(Double_t q2){ 
+	
+	Double_t mh = 5.;
+	Double_t mhp = 1.;
+	
+	return (f_Lambdab_Lambdac(q2,4) - f1V_Lambdab_Lambdac(q2))*(mh*(mh-mhp))/(-q2); 
+}
+
+
+Double_t Sigma_hyp(int sgn, Double_t mh, Double_t mhp){
+	return pow(mh, 2) +sgn*pow(mhp, 2);
+}
+Double_t Delta_hyp(int sgn, Double_t mh, Double_t mhp){
+	return mh + sgn*mhp; 
+}
+
+/////////////////
+
+Double_t a1(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
+	Double_t Sigmap = Sigma_hyp(+1, mh, mhp); Double_t Sigmam = Sigma_hyp(-1, mh, mhp);
+	Double_t Deltap = Delta_hyp(+1, mh, mhp); Double_t Deltam = Delta_hyp(-1, mh, mhp);
+	
+	Double_t Sigma_VA, Delta_VA; int sgn;
+	if(V){
+		sgn = +1;
+		Sigma_VA = Sigmap;
+		Delta_VA = Deltam;
+	}
+	else{
+		sgn = -1;
+		Sigma_VA = Sigmam;
+		Delta_VA = Deltap;
+	}
+	
+	
+	return pow(ml,2)*(q2*(pow(Sigmam,2) - 2*pow(mN,2)*Sigmap)
+					 - 2*pow(q2,2)*(pow(mN,2) - 1*sgn*mh*mhp + pow(Delta_VA,2))
+					 + 4*pow(mN,2)*pow(Sigmam, 2) 
+					 + pow(q2, 3)
+					 )
+		 +(q2 - pow(mN,2))* (pow(mN,2)*(q2*Sigmap-2*Sigmam+pow(q2,2))
+							 - q2*((pow(Delta_VA,2)-q2)*(Sigma_VA+2*q2))
+							);
+}
+
+Double_t a2(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
+	Double_t Sigmap = Sigma_hyp(+1, mh, mhp); Double_t Sigmam = Sigma_hyp(-1, mh, mhp);
+	Double_t Deltap = Delta_hyp(+1, mh, mhp); Double_t Deltam = Delta_hyp(-1, mh, mhp);
+	
+	Double_t Sigma_VA, Delta_VA; int sgn;
+	if(V){
+		sgn=+1;
+		Sigma_VA = Sigmap;
+		Delta_VA = Deltam;
+	}
+	else{
+		sgn=-1;
+		Sigma_VA = Sigmam;
+		Delta_VA = Deltap;
+	}
+	
+	
+	
+	return  (  q2*(pow(ml,2) + pow(mN, 2)) 
+			  +pow((pow(ml,2)-pow(mN,2)),2)
+			  -2*pow(q2,2) 
+			  )
+			*(q2*( pow(Sigma_VA,2)+sgn*4*mh*mhp )
+			  -2*(pow(Sigmam,2)+pow(q2,2))
+			  );
+}
+
+Double_t a3(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
+	return 1.;
+}
+Double_t a12(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
+	return 1.;
+}
+Double_t a13(Double_t q2, Double_t mh, Double_t mhp, Double_t ml, Double_t mN, bool V){
+	return 1.;
+}
+
+

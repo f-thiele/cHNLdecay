@@ -403,7 +403,10 @@ int main(int argc, char **argv) {
 	//std::cout<<"test2 " << test2 << std::endl;
 	//std::cout<<"kal " << kal << std::endl;
 	
-	else if(mainmode==4) std::cout<<tau0_to_U2(HNLmass, tau0);
+	else if(mainmode==4) std::cout<<tau0_to_U2(HNLmass, tau0); //MeV, ns
+	
+	else if(mainmode==5) compute_dint_Lambdab_proton(cfg, N, l, 5., 1., q2); 
+	else if(mainmode==6) compute_dint_Lambdab_Lambdac(cfg, N, l, 5., 2., q2); 
 		
 	
 	return EXIT_SUCCESS;
