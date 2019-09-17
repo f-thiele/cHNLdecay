@@ -47,7 +47,7 @@ def get_Umu2(HNLmass_GeV, HNLlifetime_ns):
 	
 	HNLmass_MeV = HNLmass_GeV*1e3;
 	
-	output = Popen(['./cHNLdecay', '--mainmode', '4', \
+	output = Popen(['./cHNLdecay', '--mainmode', '6', \
 					'--generations','13', '--mass', str(HNLmass_MeV), '--lifetime-ns', str(HNLlifetime_ns)], stdout=PIPE)
 	out = output.stdout.read()
 	print "\n------\nINFO: BR calculator output: ", out, "\n-------\n";
@@ -55,6 +55,20 @@ def get_Umu2(HNLmass_GeV, HNLlifetime_ns):
 	out_Umu2 = float(out.split()[0]);
 	
 	return out_Umu2;
+	
+
+def get_tau0ns(HNLmass_GeV, U2):
+	
+	HNLmass_MeV = HNLmass_GeV*1e3;
+	
+	output = Popen(['./cHNLdecay', '--mainmode', '7', \
+					'--generations','13', '--mass', str(HNLmass_MeV), '--angle', str(U2)], stdout=PIPE)
+	out = output.stdout.read()
+	print "\n------\nINFO: BR calculator output: ", out, "\n-------\n";
+	
+	out_tau0ns = float(out.split()[0]);
+	
+	return out_tau0ns;
 
 import matplotlib
 matplotlib.use('Agg')
@@ -100,6 +114,7 @@ def plot_prod_BR():
 		#np.append(BR3, 0.5, get_prod_BR(m, 1, 511, 0, 13))
 	
 	plt.figure()
+	
 	plt.yscale('log')
 	plt.title(r'BR prod, for fixed $\tau_N$ = '+str(lifetime)+' ns')
 	plt.xlabel("$m_N$ [GeV]", fontsize=14)
@@ -135,7 +150,7 @@ def plot_decay_BR():
 	BR1 = [];
 	BR2 = [];
 	BR3 = [];
-	M = (0.5, 1, 2, 4)
+	M = (0.5, 1, 2, 4, 6)
 	# Fixed lifetime 1ns
 	lifetime=10 #1ns
 	for m in M:
@@ -152,4 +167,25 @@ def plot_decay_BR():
 	#plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$N \rightarrow \mu^\pm K^\mp $')
 	plt.legend()
 	plt.savefig('decay_BRs_check.pdf');
+	
+def plot_lifetime():
+	
+	U2 = 1;
+	mN = np.linspace(0.5, 6.5, 20); #GeV
+	y=[]
+	for i in mN:
+		print i;
+		y.append(get_tau0ns(i,U2)*1e-9) #ns to s
+
+	
+	plt.figure()
+	plt.xscale('log')
+	plt.yscale('log')
+	plt.title(r'lifetime, $U_{\mu N}^2$ = '+str(U2))
+	plt.xlabel("$m_N$ [GeV]", fontsize=14)
+	plt.ylabel('$tau_{0}$ [s]', fontsize=14)
+	plt.plot(mN, y, color='sienna', linestyle = 'dashed',linewidth = 0.8,label=r'')
+	#plt.plot(M, BR2, color='orangered', linestyle = 'dashed',linewidth = 0.8,label=r'$N \rightarrow \mu^\pm K^\mp $')
+	plt.legend()
+	plt.savefig('lifetime_check.pdf');
 	
