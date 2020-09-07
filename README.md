@@ -68,4 +68,4 @@ Please cite this project as follows:
 ## License
 This project is licensed under the terms of the GPL v3 or any later version (**GPL-3.0-or-later**).
 
-cHNLdecay Copyright (C) 2018 **Fabian A.J. Thiele**, <fabian.thiele@cern.ch>
+cHNLdecay Copyright (C) 2018 **Fabian A.J. Thiele**, <fabian.thiele@posteo.de>
