@@ -23,6 +23,7 @@
 #include "TLegend.h"
 #include "TMath.h"
 #include "TObjString.h"
+#include "TObjArray.h"
 
 #include "HNL.h"
 #include "Lepton.h"
